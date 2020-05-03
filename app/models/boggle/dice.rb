@@ -12,5 +12,11 @@ module Boggle
       # TODO
       @type = type
     end
+
+    def client_data
+      {
+          type: type
+      }
+    end
   end
 end

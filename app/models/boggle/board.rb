@@ -11,5 +11,11 @@ module Boggle
     def initialize(size = DEFAULT_SIZE)
       @size = size
     end
+
+    def client_data
+      {
+          size: size
+      }
+    end
   end
 end
