@@ -2,18 +2,18 @@
 
 class GamesController < ApplicationController
   def show
-    render plain: 'ok'
+    render plain: "ok"
   end
 
   def destroy
-    render plain: 'ok'
+    render plain: "ok"
   end
 
   def create
-    render plain: 'ok'
+    render plain: "ok"
   end
 
   def add_word
-    render plain: 'ok'
+    render plain: "ok"
   end
 end

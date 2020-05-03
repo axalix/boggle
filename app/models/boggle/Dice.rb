@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Boggle
   class Dice
     DEFAULT_EDGES_COUNT = 6

@@ -1,4 +1,4 @@
-FROM ruby:2.6.6
+FROM ruby:2.6.5
 RUN apt-get update -qq
 RUN mkdir /myapp
 WORKDIR /myapp

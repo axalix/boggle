@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Boggle
   class Board
     DEFAULT_SIZE = 4
