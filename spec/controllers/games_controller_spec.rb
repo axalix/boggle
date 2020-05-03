@@ -34,7 +34,7 @@ RSpec.describe GamesController, type: :controller do
   #-------------------------------------------
 
   private def expect_good_response(response)
-    expect(JSON.parse(response.body)).to eql({ 'status' => 'ok' })
+    expect(JSON.parse(response.body, symbolize_names: true)).to include({ status: 'ok' })
     expect(response.content_type).to eq 'application/json; charset=utf-8'
   end
 end
