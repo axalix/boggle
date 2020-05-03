@@ -8,3 +8,17 @@ services:
       - .:/myapp
     ports:
       - "3000:3000"
+    env_file:
+      - development.env
+    depends_on:
+      - api_redis
+
+  api_redis:
+    image: redis
+    volumes:
+      - 'redis:/data'
+    expose:
+      - 6379
+
+volumes:
+  redis:
