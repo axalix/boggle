@@ -1,0 +1,1 @@
+DICTIONARY_REDIS = Redis.new(host: 'dictionary_redis')

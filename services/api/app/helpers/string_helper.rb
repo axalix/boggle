@@ -8,4 +8,8 @@ module StringHelper
   def self.sanitize_and_lowercase(word)
     word.downcase.gsub(/[^a-z]/, '')
   end
+
+  def self.real_word?(word)
+    !!DICTIONARY_REDIS.sismember('dict', word)
+  end
 end
