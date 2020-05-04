@@ -6,15 +6,22 @@ module Boggle
 
     include ActiveModel::Model
 
-    attr_accessor :size
+    attr_accessor :size,
+                  :dice_string # fixated dice representation. Each dice represent 1 character
 
     def initialize(size = DEFAULT_SIZE)
       @size = size
+      @dice_string = ''
+    end
+
+    def shuffle(dice)
+      # TODO
     end
 
     def client_data
       {
-          size: size
+          size: size,
+          chars: chars
       }
     end
   end

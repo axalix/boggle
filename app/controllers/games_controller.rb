@@ -25,7 +25,7 @@ class GamesController < ApplicationController
   end
 
   def add_word
-    word = params.require(:word)
+    word = StringHelper.sanitize_and_lowercase(params.require(:word))
     @game.add_word!(word)
     render :nothing
   end
