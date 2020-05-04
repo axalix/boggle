@@ -2,21 +2,27 @@ version: '3'
 services:
 
   api:
-    build: .
+    build: ./services/api
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - .:/myapp
+      - ./services/api/:/myapp
     ports:
       - "3000:3000"
     env_file:
-      - development.env
+      - ./services/api/development.env
     depends_on:
       - api_redis
+      - dictionary_redis
 
   api_redis:
     image: redis
     volumes:
       - 'redis:/data'
+    expose:
+      - 6379
+
+  dictionary_redis:
+    build: ./services/dictionary
     expose:
       - 6379
 
