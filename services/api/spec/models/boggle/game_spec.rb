@@ -27,9 +27,9 @@ RSpec.describe Boggle::Game, type: :model do
   end
 
   subject { described_class.new(
-      dice_type: dice_type,
-      board_size: board_size,
-      game_length_secs: game_length_secs
+    dice_type: dice_type,
+    board_size: board_size,
+    game_length_secs: game_length_secs
   ) }
 
   describe 'instantiation' do

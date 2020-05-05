@@ -49,9 +49,9 @@ module Boggle
     def self.restore(id)
       persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
       self.new(
-          dice_type:        persisted['dice_type'].to_s,
-          board_size:       persisted['board_size'].to_i,
-          game_length_secs: persisted['game_length_secs'].to_i
+        dice_type:        persisted['dice_type'].to_s,
+        board_size:       persisted['board_size'].to_i,
+        game_length_secs: persisted['game_length_secs'].to_i
       ).tap do |g|
         g.board.dice_string = persisted['dice_string']
         g.timer.started_at = persisted['started_at'].to_time
