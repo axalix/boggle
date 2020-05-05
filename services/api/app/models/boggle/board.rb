@@ -6,22 +6,19 @@ module Boggle
 
     include ActiveModel::Model
 
-    attr_accessor :size,
-                  :dice_string # fixated dice representation. Each dice represent 1 character
+    # "size" is a board dimension. For example for a board 4x4, "size" is 4
+    # "dice_string": selected (shuffled) chars on all the dice
+    attr_reader :size, :dice_string
 
-    def initialize(size = DEFAULT_SIZE)
+    def initialize(dice_string, size = DEFAULT_SIZE)
       @size = size
-      @dice_string = ''
-    end
-
-    def shuffle(dice)
-      # TODO
+      @dice_string = dice_string
     end
 
     def client_data
       {
           size: size,
-          chars: chars
+          dice_string: dice_string
       }
     end
   end

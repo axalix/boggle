@@ -32,7 +32,7 @@ module Boggle
       @type = type
     end
 
-    # This class method returns a string that represents a full set of dice with fixated, pseudo-random chars
+    # This class method returns a "dice_string": selected (shuffled) chars on all the dice
     def self.roll_all_str(type = DEFAULT_TYPE)
       dice = self.new(type)
       result = []

@@ -12,12 +12,12 @@ RSpec.describe Boggle::Dice, type: :model do
       expect { subject.roll('string') }.to raise_error(Boggle::Errors::ImpossibleDice)
     end
 
-    it 'throws an exception if the dice number is outside is outside of a range' do
+    it 'throws an exception if the dice number is outside of a range' do
       expect { subject.roll(-1) }.to raise_error(Boggle::Errors::ImpossibleDice)
       expect { subject.roll(100) }.to raise_error(Boggle::Errors::ImpossibleDice)
     end
 
-    it 'throws an exception if the dice number is outside is outside of a range' do
+    it 'throws an exception if the dice number is outside of a range' do
       expect { subject.roll(-1) }.to raise_error(Boggle::Errors::ImpossibleDice)
       expect { subject.roll(100) }.to raise_error(Boggle::Errors::ImpossibleDice)
     end
