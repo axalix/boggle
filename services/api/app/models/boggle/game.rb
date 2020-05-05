@@ -46,7 +46,7 @@ module Boggle
 
     def self.restore(id)
       persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
-      raise Boggle::Errors::GameNotFound if persisted.empty?
+      raise Boggle::Errors::GameNotFound unless persisted
 
       self.new(
         dice_type:        persisted['dice_type'].to_s,

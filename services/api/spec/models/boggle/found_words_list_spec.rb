@@ -14,10 +14,10 @@ RSpec.describe Boggle::FoundWordsList, type: :model do
   end
 
   subject { described_class.new(game: Boggle::Game.new(
-      id:               'ABC',
-      dice_type:        :classic_16,
-      board_size:       4,
-      game_length_secs: 180
+    id:               'ABC',
+    dice_type:        :classic_16,
+    board_size:       4,
+    game_length_secs: 180
   )) }
 
   describe '#add_word!' do

@@ -17,6 +17,7 @@ RSpec.describe Boggle::Game, type: :model do
   let(:dice_chars) { 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw' }
   let(:dice_count) { 16 }
   let(:status) { 'running' }
+  let(:word) { 'apple' }
 
   before do
     allow(Redis).to receive(:current).and_return(current_redis_instance)
@@ -44,6 +45,10 @@ RSpec.describe Boggle::Game, type: :model do
 
     it 'returns a timer with a correct game length' do
       expect(subject.timer.game_length_secs).to eq game_length_secs
+    end
+
+    it 'returns a list of found words, linked to a game' do
+      expect(subject.found_words_list.game).to eq subject
     end
 
     it 'returns status = nil' do
@@ -89,12 +94,31 @@ RSpec.describe Boggle::Game, type: :model do
       expect(game.timer.started_at).to eq '2020-05-05 16:28:25 +0000'.to_time
       expect(game.timer.stopped_at).to eq '2020-05-05 16:28:30 +0000'.to_time
     end
+
+    it 'it throws an exception if a game cannot be found in Redis' do
+      allow(current_redis_instance).to receive(:hgetall).and_return nil
+      expect { described_class.restore(id) }.to raise_error(Boggle::Errors::GameNotFound)
+    end
   end
 
-  describe 'when game is not over' do
+  describe 'add_word!' do
+    it 'it throws an exception if a game is not running' do
+      allow(subject).to receive(:over?).and_return false
+      expect { subject.add_word!(word) }.to raise_error(Boggle::Errors::GameIsNotRunning)
+    end
+
+    it 'calls "found_words_list" model to add a word' do
+      allow(subject).to receive(:over?).and_return false
+      allow(subject.timer).to receive(:running?).and_return true
+      expect(subject.found_words_list).to receive(:add_word!).with(word)
+      subject.add_word! word
+    end
+  end
+
+  describe 'game is not over' do
     before { allow(subject).to receive(:over?).and_return false }
 
-    context 'when starting a game' do
+    context 'starting a game' do
       before {
         allow(StringHelper).to receive(:random_token).and_return random_token
       }
@@ -114,12 +138,22 @@ RSpec.describe Boggle::Game, type: :model do
         expect(subject.board.dice_string).to match(/[a-z]{#{dice_count}}/)
       end
 
+      it 'initializes a list of found words' do
+        expect(subject.found_words_list).to receive(:create!)
+        subject.start!
+      end
+
+      it 'starts the timer' do
+        expect(subject.timer).to receive(:start)
+        subject.start!
+      end
+
       it 'persists a game' do
         expect(subject).to receive(:save!)
         subject.start!
       end
 
-      context 'when stopping a game' do
+      context 'stopping a game' do
         it 'stops the timer' do
           expect(subject.timer).to receive(:stop)
           subject.stop!
@@ -138,15 +172,19 @@ RSpec.describe Boggle::Game, type: :model do
     end
   end
 
-  describe 'when game is over' do
+  describe 'game is over' do
     before { allow(subject).to receive(:over?).and_return true }
 
-    it 'when starting a game, it throws an exception' do
+    it 'throws an exception, when starting a game' do
       expect { subject.start! }.to raise_error(Boggle::Errors::GameIsOver)
     end
 
-    it 'when stopping a game, it throws an exception' do
+    it 'it throws an exception, when stopping a game' do
       expect { subject.stop! }.to raise_error(Boggle::Errors::GameIsOver)
+    end
+
+    it 'it throws an exception, when trying to add a game' do
+      expect { subject.add_word!(word) }.to raise_error(Boggle::Errors::GameIsOver)
     end
 
     it 'returns status "over"' do
