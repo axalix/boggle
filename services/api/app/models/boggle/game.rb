@@ -2,8 +2,6 @@
 
 module Boggle
   class Game < BoggleObject
-    FORGET_GAME_AFTER_SECONDS = 1.hour.seconds
-
     include ActiveModel::Model
 
     attr_accessor :id,
@@ -25,8 +23,8 @@ module Boggle
       @timer ||= Timer.new(game_length_secs: game_length_secs)
     end
 
-    def found_words
-      @found_words ||= Boggle::GetFoundWords.call(game: self)
+    def found_words_list
+      @found_words_list ||= FoundWordsList.new(game: self)
     end
 
     #----- Persisting logic
@@ -48,40 +46,38 @@ module Boggle
 
     def self.restore(id)
       persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
+      raise Boggle::Errors::GameNotFound if persisted.empty?
+
       self.new(
         dice_type:        persisted['dice_type'].to_s,
         board_size:       persisted['board_size'].to_i,
         game_length_secs: persisted['game_length_secs'].to_i
       ).tap do |g|
         g.board.dice_string = persisted['dice_string']
-        g.timer.started_at = persisted['started_at'].to_time
-        g.timer.stopped_at = persisted['stopped_at'] == '' ? nil : persisted['stopped_at'].to_time
+        g.timer.started_at  = persisted['started_at'].to_time
+        g.timer.stopped_at  = persisted['stopped_at'] == '' ? nil : persisted['stopped_at'].to_time
       end
     end
 
     #----- Game flow
 
     def start!
+      game_over_check!
+
       if timer.running?
         raise Boggle::Errors::GameIsRunning, 'Cannot restart a running game'
-      end
-
-      if over?
-        raise Boggle::Errors::GameIsOver, 'Cannot restart a stopped game'
       end
 
       self.tap do |g|
         g.id = StringHelper.random_token
         g.board.dice_string = dice.roll_all
+        g.found_words_list.create!
         g.timer.start
       end.save!
     end
 
     def stop!
-      if over?
-        raise Boggle::Errors::GameIsOver, 'Cannot stop a stopped game'
-      end
-
+      game_over_check!
       self.timer.stop
       self.save!
     end
@@ -92,14 +88,13 @@ module Boggle
     end
 
     def add_word!(word)
-      if timer.over?
-        raise Boggle::Errors::GameIsOver, 'Cannot add a word when game is over'
+      game_over_check!
+
+      unless timer.running?
+        raise Boggle::Errors::GameIsNotRunning, 'Cannot add a word to a not running game'
       end
 
-      Boggle::AddWord.call(game: self, word: word)
-
-      # TODO: track scores
-      self.save!
+      found_words_list.add_word! word
     end
 
     def status
@@ -132,8 +127,14 @@ module Boggle
       }
     end
 
-    def client_data_with_found_words
-      client_data.merge(found_words: found_words)
+    # def client_data_with_found_words
+    #   client_data.merge(found_words: found_words)
+    # end
+
+    private def game_over_check!
+      if over?
+        raise Boggle::Errors::GameIsOver, 'The game is over'
+      end
     end
   end
 end

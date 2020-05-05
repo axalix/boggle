@@ -24,6 +24,7 @@ RSpec.describe Boggle::Game, type: :model do
     allow(current_redis_instance).to receive(:expire)
     allow(current_redis_instance).to receive(:exists)
     allow(current_redis_instance).to receive(:hgetall)
+    allow(current_redis_instance).to receive(:multi)
   end
 
   subject { described_class.new(
@@ -50,7 +51,7 @@ RSpec.describe Boggle::Game, type: :model do
     end
   end
 
-  describe 'when save! is called' do
+  describe '#save!' do
     it 'should assign new id, when "id" is nil' do
       new_id = 'QRy4RoN7YE9Tp0nkttDznw"'
       allow(StringHelper).to receive(:random_token).and_return new_id
