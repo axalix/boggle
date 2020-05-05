@@ -11,9 +11,9 @@ class GamesController < ApplicationController
   end
 
   def create
-    # Player can only play one game at a time with the same token
-    # In case previous game exists, it should be deleted
-    Boggle::Game.delete!(game_token) if game_token
+    # # Player can only play one game at a time with the same token
+    # # In case previous game exists, it should be deleted
+    # Boggle::Game.delete!(game_token) if game_token
     @game = Boggle::Game.new(:classic_16, 4, 10) # TODO: parameters
     @game.start!
     render json: @game.client_data

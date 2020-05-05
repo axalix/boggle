@@ -9,7 +9,7 @@ RSpec.describe Boggle::Timer, type: :model do
 
   subject { described_class.new(game_length_secs) }
 
-  before(:each) do
+  before do
     allow(Time).to receive(:now).and_return(started_at)
   end
 
@@ -26,6 +26,7 @@ RSpec.describe Boggle::Timer, type: :model do
   end
 
   describe 'timer has never been started' do
+    # time is up - no time left
     it 'is up' do
       expect(subject.up?).to eq true
     end
@@ -37,10 +38,18 @@ RSpec.describe Boggle::Timer, type: :model do
     it 'is not over' do
       expect(subject.over?).to eq false
     end
+
+    it 'shows 0 seconds_left left' do
+      expect(subject.seconds_left).to eq 0
+    end
   end
 
   describe 'timer was started' do
-    before(:each) { subject.start }
+    let(:seconds_ticked) { 1.second }
+    before {
+      allow(Time).to receive(:now).and_return(Time.now + seconds_ticked)
+      subject.start
+    }
 
     it 'is up' do
       expect(subject.up?).to eq false
@@ -54,8 +63,13 @@ RSpec.describe Boggle::Timer, type: :model do
       expect(subject.over?).to eq false
     end
 
+    it 'shows seconds left if it is less than the length of the game' do
+      allow(Time).to receive(:now).and_return(subject.started_at + game_length_secs - 1.second)
+      expect(subject.seconds_left).to eq 1
+    end
+
     context 'last second is reached' do
-      before(:each) { allow(Time).to receive(:now).and_return(Time.now + game_length_secs.seconds) }
+      before { allow(Time).to receive(:now).and_return(Time.now + game_length_secs.seconds) }
 
       it 'is up' do
         expect(subject.up?).to eq true
@@ -68,13 +82,20 @@ RSpec.describe Boggle::Timer, type: :model do
       it 'is over' do
         expect(subject.over?).to eq true
       end
+
+      it 'shows 0 seconds left' do
+        expect(subject.seconds_left).to eq 0
+      end
     end
 
     context 'timer was stopped' do
-      before(:each) { subject.stop }
+      before {
+        allow(Time).to receive(:now).and_return(Time.now + seconds_ticked)
+        subject.stop
+      }
 
-      it 'technically is not yet up based on time and the length of the game' do
-        expect(subject.up?).to eq false
+      it 'is up' do
+        expect(subject.up?).to eq true
       end
 
       it 'is not running' do
@@ -83,6 +104,10 @@ RSpec.describe Boggle::Timer, type: :model do
 
       it 'is over' do
         expect(subject.over?).to eq true
+      end
+
+      it 'shows 0 seconds left' do
+        expect(subject.seconds_left).to eq 0
       end
     end
   end

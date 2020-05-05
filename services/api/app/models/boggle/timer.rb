@@ -22,19 +22,27 @@ module Boggle
       @stopped_at = Time.now
     end
 
-    # time is up
+    # a diff between the length of the game and seconds pass. Zero if negative
+    def seconds_left
+      return 0 if started_at.nil? || !stopped_at.nil?
+      s = (Time.now - started_at).seconds
+      s >= game_length_secs ? 0 : (game_length_secs - s).to_i
+    end
+
+    # time is up if timer has never been started or 0 seconds left
     def up?
       return true if started_at.nil? || game_length_secs.nil?
-
-      (Time.now - started_at).seconds >= game_length_secs
+      seconds_left.zero?
     end
 
-    # timer is started, not manually stopped and not yet up
+    # not manually stopped and not yet up
     def running?
-      !started_at.nil? && stopped_at.nil? && !up?
+      stopped_at.nil? && !up?
     end
 
-    # timer was running before, but not anymore
+    # Timer was running before, but not anymore
+    # This usually means the game is over.
+    # On case timer has never been started "over?" returns false
     def over?
       !started_at.nil? && !running?
     end

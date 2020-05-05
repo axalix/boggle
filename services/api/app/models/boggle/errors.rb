@@ -7,6 +7,7 @@ module Boggle
     # Game
     GameNotFound    = Class.new(StandardError)
     GameNotStarted  = Class.new(StandardError)
+    GameIsRunning   = Class.new(StandardError)
     GameIsOver      = Class.new(StandardError)
 
     # Dice

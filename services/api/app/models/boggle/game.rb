@@ -9,15 +9,13 @@ module Boggle
     attr_accessor :id,
                   :dice_type,
                   :board_size,
-                  :game_length_secs,
-                  :dice_string
+                  :game_length_secs
 
     def initialize(dice_type, board_size, game_length_secs)
       @id               = nil
       @dice_type        = dice_type
       @board_size       = board_size
       @game_length_secs = game_length_secs
-      @dice_string      = ''
     end
 
     #----- Data-to-objects mapping
@@ -45,19 +43,20 @@ module Boggle
     end
 
     def save!
-      unless id
-        raise Boggle::Errors::GameNotStarted, 'Cannot save a game if it has never been started'
-      end
-
+      @id = StringHelper.random_token unless id
       rid = Boggle::Game.redis_id(id)
       Redis.current.mapped_hmset(rid, attributes)
       Redis.current.expire(rid, FORGET_GAME_AFTER_SECONDS)
     end
 
+    def self.exists?(id)
+      Redis.current.exists(Boggle::Game.redis_id(id))
+    end
+
     def self.restore(id)
       persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
       self.new(persisted['dice_type'].to_s, persisted['board_size'].to_i, persisted['game_length_secs'].to_i).tap do |g|
-        g.dice_string = persisted['dice_string']
+        g.board.dice_string = persisted['dice_string']
         g.timer.started_at = persisted['started_at'].to_time
         g.timer.stopped_at = persisted['stopped_at'] == '' ? nil : persisted['stopped_at'].to_time
       end
@@ -66,13 +65,17 @@ module Boggle
     #----- Game flow
 
     def start!
+      if timer.running?
+        raise Boggle::Errors::GameIsRunning, 'Cannot restart a running game'
+      end
+
       if over?
         raise Boggle::Errors::GameIsOver, 'Cannot restart a stopped game'
       end
 
       self.tap do |g|
         g.id = StringHelper.random_token
-        g.dice_string = dice.roll_all
+        g.board.dice_string = dice.roll_all
         g.timer.start
       end.save!
     end
@@ -93,7 +96,7 @@ module Boggle
 
     def add_word!(word)
       if timer.over?
-        raise Boggle::Errors::GameIsOver, 'Cannot add a word for a stopped game'
+        raise Boggle::Errors::GameIsOver, 'Cannot add a word when game is over'
       end
 
       Boggle::AddWord.call(game: self, word: word)
@@ -102,13 +105,13 @@ module Boggle
       self.save!
     end
 
-    #----- Data
-
     def status
-      return 'over' if over?
-      return 'running' if timer.running?
+      return :over if over?
+      return :running if timer.running?
       nil
     end
+
+    #----- Data
 
     def attributes
       {
@@ -116,7 +119,7 @@ module Boggle
         dice_type:        dice_type,
         board_size:       board_size,
         game_length_secs: game_length_secs,
-        dice_string:      dice_string,
+        dice_string:      board.dice_string,
         started_at:       timer.started_at,
         stopped_at:       timer.stopped_at
       }
@@ -124,12 +127,11 @@ module Boggle
 
     def client_data
       {
-          id:           id,
-          board:        board.client_data,
-          dice:         dice.client_data,
-          timer:        timer.client_data,
-          dice_string:  dice_string,
-          status:       status
+        id:           id,
+        board:        board.client_data,
+        dice:         dice.client_data,
+        seconds_left: timer.seconds_left,
+        status:       status
       }
     end
 
