@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Boggle::Dice, type: :model do
-  let(:alphabet_chars) { 'AAAAAABBBBBBCCCCCCDDDDDDEEEEEEFFFFFFGGGGGGHHHHHHIIIIIIJJJJJJKKKKKKLLLLLLMMMMMMNNNNNNOOOOOOPPPPPP' }
+  let(:alphabet_chars) { 'aaaaaabbbbbbccccccddddddeeeeeeffffffgggggghhhhhhiiiiiijjjjjjkkkkkkllllllmmmmmmnnnnnnoooooopppppp' }
 
   describe 'classic board with dice of classic_16 is selected' do
     subject { described_class.new(:classic_16) }
@@ -23,32 +23,32 @@ RSpec.describe Boggle::Dice, type: :model do
     end
 
     context 'when we roll a dice' do
-      it 'returns a capital latin character' do
-        expect(subject.roll(0)).to match(/[ACIOT]/)
+      it 'returns a lower latin character' do
+        expect(subject.roll(0)).to match(/[aciot]/)
       end
 
       it 'returns a correct character' do
         with_an_alphabetical_set do
-          (0..15).each { |i| expect(subject.roll(i)).to eq (65 + i).chr }
+          (0..15).each { |i| expect(subject.roll(i)).to eq (97 + i).chr }
         end
       end
     end
 
     context 'when we roll all dice' do
       it 'returns a string that represents a result' do
-        expect(described_class.roll_all_str).to match(/[A-Z]{16}/)
+        expect(subject.roll_all).to match(/[a-z]{16}/)
       end
 
       it 'returns a correct set of characters for each dice' do
         with_an_alphabetical_set do
-          expect(described_class.roll_all_str).to eq 'ABCDEFGHIJKLMNOP'
+          expect(subject.roll_all).to eq 'abcdefghijklmnop'
         end
       end
     end
 
     it 'returns client_data in a correct format' do
       expect(subject.client_data).to eq({
-        dice_chars: 'AACIOTABILTYABJMOQACDEMPACELRSADENVZAHMORSBIFORXDENOSWDKNOTUEEFHIYEGKLUYEGINTVEHINPSELPSTUGILRUW',
+        dice_chars: 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw',
         dice_count: 16
       })
     end

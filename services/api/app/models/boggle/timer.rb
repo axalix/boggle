@@ -6,7 +6,7 @@ module Boggle
 
     include ActiveModel::Model
 
-    attr_reader :started_at, :stopped_at, :game_length_secs
+    attr_accessor :started_at, :stopped_at, :game_length_secs
 
     def initialize(game_length_secs = DEFAULT_MAX_GAME_LENGTH_SECS)
       @started_at = nil
@@ -22,10 +22,21 @@ module Boggle
       @stopped_at = Time.now
     end
 
+    # time is up
+    def up?
+      return true if started_at.nil? || game_length_secs.nil?
+
+      (Time.now - started_at).seconds >= game_length_secs
+    end
+
+    # timer is started, not manually stopped and not yet up
     def running?
-      !@started_at.nil? && # never started
-      @stopped_at.nil?  && # started, but manually stopped
-      (Time.now - started_at).seconds < game_length_secs # just ended / expired
+      !started_at.nil? && stopped_at.nil? && !up?
+    end
+
+    # timer was running before, but not anymore
+    def over?
+      !started_at.nil? && !running?
     end
 
     def client_data

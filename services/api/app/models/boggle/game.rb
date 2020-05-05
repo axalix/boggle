@@ -5,21 +5,39 @@ module Boggle
     include ActiveModel::Model
 
     attr_accessor :id,
-                  :board,
-                  :dice,
-                  :timer,
-                  :score,
-                  :found_words
+                  :dice_type,
+                  :board_size,
+                  :game_length_secs,
+                  :dice_string
 
-    def initialize
-      # TODO
-      @id = nil
-      @board  = Board.new
-      @dice   = Dice.new(:dice_type)
-      @timer  = Timer.new
-      @score  = 0
-      @found_words = []
+    def initialize(dice_type, board_size, game_length_secs)
+      @id               = nil
+      @dice_type        = dice_type
+      @boards_size      = board_size
+      @game_length_secs = game_length_secs
+      @game_length_secs = game_length_secs
+      @dice_string      = ''
     end
+
+    #----- Data-to-objects mapping
+
+    def board
+      @board ||= Boggle::Board.new(board_size)
+    end
+
+    def dice
+      @dice ||= Dice.new(dice_type)
+    end
+
+    def timer
+      @timer ||= Timer.new(game_length_secs)
+    end
+
+    def found_words
+      @found_words ||= Boggle::GetFoundWords.call(game: self)
+    end
+
+    #----- Persisting logic
 
     def save!
       Boggle::Save.call(game: self)
@@ -33,19 +51,22 @@ module Boggle
       Boggle::Delete.call(id: id)
     end
 
+    #----- Game flow
+
     def start!
-      if over?
+      if timer.over?
         raise Boggle::Errors::GameIsOver, 'Cannot restart a stopped game'
       end
 
       self.tap do |g|
         g.id = StringHelper.random_token
+        g.dice_string = dice.roll_all
         g.timer.start
       end.save!
     end
 
     def stop!
-      if over?
+      if timer.over?
         raise Boggle::Errors::GameIsOver, 'Cannot stop a stopped game'
       end
 
@@ -54,7 +75,7 @@ module Boggle
     end
 
     def add_word!(word)
-      if over?
+      if timer.over?
         raise Boggle::Errors::GameIsOver, 'Cannot add a word for a stopped game'
       end
 
@@ -64,30 +85,22 @@ module Boggle
       self.save!
     end
 
-    def running?
-      timer.running?
-    end
-
-    def over?
-      !running?
-    end
+    #----- Data
 
     def status
-      over? ? 'over' : 'running'
-    end
-
-    def found_words
-      @found_words ||= Boggle::GetFoundWords.call(game: self)
+      return 'over' if timer.over?
+      return 'running' if timer.running?
+      nil
     end
 
     def client_data
       {
-          id:     id,
-          board:  board.client_data,
-          dice:   dice.client_data,
-          timer:  timer.client_data,
-          score:  score,
-          status: status
+          id:           id,
+          board:        board.client_data,
+          dice:         dice.client_data,
+          timer:        timer.client_data,
+          dice_string:  dice_string,
+          status:       status
       }
     end
 

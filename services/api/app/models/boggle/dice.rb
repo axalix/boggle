@@ -8,17 +8,17 @@ module Boggle
     # http://www.bananagrammer.com/2013/10/the-boggle-cube-redesign-and-its-effect.html
     TYPES = {
         classic_16: {
-            dice_chars: 'AACIOTABILTYABJMOQACDEMPACELRSADENVZAHMORSBIFORXDENOSWDKNOTUEEFHIYEGKLUYEGINTVEHINPSELPSTUGILRUW',
+            dice_chars: 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw',
             dice_count: 16
         },
 
         new_16: {
-            dice_chars: 'AAEEGNABBJOOACHOPSAFFKPSAOOTTWCIMOTUDEILRXDELRVYDISTTYEEGHNWEEINSUEHRTVWEIOSSTELRTTYHIMNUQHLNNRZ',
+            dice_chars: 'aaeegnabbjooachopsaffkpsaoottwcimotudeilrxdelrvydisttyeeghnweeinsuehrtvweiosstelrttyhimnuqhlnnrz',
             dice_count:  16
         },
 
         fancy_25: {
-            dice_chars: 'AACIOTABILTYABJMOQACDEMPACELRSADENVZAHMORSBIFORXDENOSWDKNOTUEEFHIYEGKLUYEGINTVEHINPSELPSTUGILRUWAAEEGNABBJOOACHOPSAFFKPSAOOTTWCIMOTUDEILRXDELRVYDISTTY',
+            dice_chars: 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruwaaeegnabbjooachopsaffkpsaoottwcimotudeilrxdelrvydistty',
             dice_count: 25
         }
     }.freeze
@@ -33,10 +33,9 @@ module Boggle
     end
 
     # This class method returns a "dice_string": selected (shuffled) chars on all the dice
-    def self.roll_all_str(type = DEFAULT_TYPE)
-      dice = self.new(type)
+    def roll_all
       result = []
-      0.upto(TYPES[type][:dice_count] - 1) { |dice_number| result << dice.roll(dice_number) }
+      0.upto(TYPES[type][:dice_count] - 1) { |dice_number| result << self.roll(dice_number) }
       result.join
     end
 
