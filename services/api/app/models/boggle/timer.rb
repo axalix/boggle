@@ -1,18 +1,10 @@
 # frozen_string_literal: true
 
 module Boggle
-  class Timer
-    DEFAULT_MAX_GAME_LENGTH_SECS = 180
-
-    include ActiveModel::Model
-
+  class Timer < BoggleObject
     attr_accessor :started_at, :stopped_at, :game_length_secs
 
-    def initialize(game_length_secs = DEFAULT_MAX_GAME_LENGTH_SECS)
-      @started_at = nil
-      @stopped_at = nil
-      @game_length_secs = game_length_secs
-    end
+    validates :game_length_secs, presence: true, numericality: { only_integer: true }
 
     def start
       @started_at = Time.now

@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 module Boggle
-  class Dice
+  class Dice < BoggleObject
     DICE_EDGES_COUNT = 6
-    DEFAULT_TYPE = :classic_16
 
     # http://www.bananagrammer.com/2013/10/the-boggle-cube-redesign-and-its-effect.html
     TYPES = {
@@ -23,14 +22,9 @@ module Boggle
         }
     }.freeze
 
-    include ActiveModel::Model
-
     attr_accessor :type
 
-    def initialize(type = DEFAULT_TYPE)
-      raise Boggle::Errors::ImpossibleDice, 'Unknown dice type' unless TYPES.key? type
-      @type = type
-    end
+    validates :type, inclusion: { in: TYPES.keys }, presence: true
 
     # This class method returns a "dice_string": selected (shuffled) chars on all the dice
     def roll_all

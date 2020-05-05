@@ -6,7 +6,7 @@ RSpec.describe Boggle::Dice, type: :model do
   let(:alphabet_chars) { 'aaaaaabbbbbbccccccddddddeeeeeeffffffgggggghhhhhhiiiiiijjjjjjkkkkkkllllllmmmmmmnnnnnnoooooopppppp' }
 
   describe 'classic board with dice of classic_16 is selected' do
-    subject { described_class.new(:classic_16) }
+    subject { described_class.new(type: :classic_16) }
 
     it 'throws an exception if the dice number is not a number at all' do
       expect { subject.roll('string') }.to raise_error(Boggle::Errors::ImpossibleDice)
@@ -55,7 +55,11 @@ RSpec.describe Boggle::Dice, type: :model do
   end
 
   it 'throws an exception if dice of unknown type is selected' do
-    expect { described_class.new(:unknown_type) }.to raise_error(Boggle::Errors::ImpossibleDice)
+    expect { described_class.new(type: :unknown_type) }.to raise_error(ActiveModel::ValidationError)
+  end
+
+  it 'throws an exception type is not set' do
+    expect { described_class.new }.to raise_error(ActiveModel::ValidationError)
   end
 
   #----------------------

@@ -7,7 +7,7 @@ RSpec.describe Boggle::Timer, type: :model do
   let(:started_at) { Time.now }
   let(:stopped_at) { started_at + 1.second }
 
-  subject { described_class.new(game_length_secs) }
+  subject { described_class.new(game_length_secs: game_length_secs) }
 
   describe 'timer has never been started' do
     # time is up - no time left

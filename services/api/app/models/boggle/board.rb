@@ -1,18 +1,12 @@
 # frozen_string_literal: true
 
 module Boggle
-  class Board
-    DEFAULT_SIZE = 4
-
-    include ActiveModel::Model
-
+  class Board < BoggleObject
     # "size" is a board dimension. For example for a board 4x4, "size" is 4
     # "dice_string": selected (shuffled) chars on all the dice
     attr_accessor :size, :dice_string
 
-    def initialize(size = DEFAULT_SIZE)
-      @size = size
-    end
+    validates :size, presence: true, numericality: { only_integer: true }
 
     def client_data
       {

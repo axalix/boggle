@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Boggle
-  class Game
+  class Game < BoggleObject
     FORGET_GAME_AFTER_SECONDS = 1.hour.seconds
 
     include ActiveModel::Model
@@ -11,25 +11,18 @@ module Boggle
                   :board_size,
                   :game_length_secs
 
-    def initialize(dice_type, board_size, game_length_secs)
-      @id               = nil
-      @dice_type        = dice_type
-      @board_size       = board_size
-      @game_length_secs = game_length_secs
-    end
-
     #----- Data-to-objects mapping
 
     def board
-      @board ||= Boggle::Board.new(board_size)
+      @board ||= Boggle::Board.new(size: board_size)
     end
 
     def dice
-      @dice ||= Dice.new(dice_type)
+      @dice ||= Dice.new(type: dice_type)
     end
 
     def timer
-      @timer ||= Timer.new(game_length_secs)
+      @timer ||= Timer.new(game_length_secs: game_length_secs)
     end
 
     def found_words
@@ -55,7 +48,11 @@ module Boggle
 
     def self.restore(id)
       persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
-      self.new(persisted['dice_type'].to_s, persisted['board_size'].to_i, persisted['game_length_secs'].to_i).tap do |g|
+      self.new(
+          dice_type:        persisted['dice_type'].to_s,
+          board_size:       persisted['board_size'].to_i,
+          game_length_secs: persisted['game_length_secs'].to_i
+      ).tap do |g|
         g.board.dice_string = persisted['dice_string']
         g.timer.started_at = persisted['started_at'].to_time
         g.timer.stopped_at = persisted['stopped_at'] == '' ? nil : persisted['stopped_at'].to_time
