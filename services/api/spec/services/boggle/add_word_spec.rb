@@ -2,6 +2,6 @@
 
 require 'rails_helper'
 
-RSpec.describe Boggle::SearchDictionaryWord do
+RSpec.describe Boggle::AddWord do
   it 'is valid by-default'
 end

@@ -2,6 +2,6 @@
 
 require 'rails_helper'
 
-RSpec.describe Boggle::CalculateWordScore do
+RSpec.describe Boggle::GetFoundWords do
   it 'is valid by-default'
 end

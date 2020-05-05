@@ -10,13 +10,6 @@ RSpec.describe GamesController, type: :controller do
     end
   end
 
-  describe '#destroy' do
-    it 'returns ok and status 200' do
-      delete :destroy
-      expect_good_response response
-    end
-  end
-
   describe '#create' do
     it 'returns ok and status 200' do
       post :create

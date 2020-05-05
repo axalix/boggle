@@ -2,6 +2,8 @@
 
 module Boggle
   class Game
+    FORGET_GAME_AFTER_SECONDS = 1.hour.seconds
+
     include ActiveModel::Model
 
     attr_accessor :id,
@@ -13,8 +15,7 @@ module Boggle
     def initialize(dice_type, board_size, game_length_secs)
       @id               = nil
       @dice_type        = dice_type
-      @boards_size      = board_size
-      @game_length_secs = game_length_secs
+      @board_size       = board_size
       @game_length_secs = game_length_secs
       @dice_string      = ''
     end
@@ -39,22 +40,33 @@ module Boggle
 
     #----- Persisting logic
 
+    def self.redis_id(id)
+      "boggle:game:#{id}"
+    end
+
     def save!
-      Boggle::Save.call(game: self)
+      unless id
+        raise Boggle::Errors::GameNotStarted, 'Cannot save a game if it has never been started'
+      end
+
+      rid = Boggle::Game.redis_id(id)
+      Redis.current.mapped_hmset(rid, attributes)
+      Redis.current.expire(rid, FORGET_GAME_AFTER_SECONDS)
     end
 
     def self.restore(id)
-      Boggle::Restore.call(id: id)
-    end
-
-    def self.delete!(id)
-      Boggle::Delete.call(id: id)
+      persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
+      self.new(persisted['dice_type'].to_s, persisted['board_size'].to_i, persisted['game_length_secs'].to_i).tap do |g|
+        g.dice_string = persisted['dice_string']
+        g.timer.started_at = persisted['started_at'].to_time
+        g.timer.stopped_at = persisted['stopped_at'] == '' ? nil : persisted['stopped_at'].to_time
+      end
     end
 
     #----- Game flow
 
     def start!
-      if timer.over?
+      if over?
         raise Boggle::Errors::GameIsOver, 'Cannot restart a stopped game'
       end
 
@@ -66,12 +78,17 @@ module Boggle
     end
 
     def stop!
-      if timer.over?
+      if over?
         raise Boggle::Errors::GameIsOver, 'Cannot stop a stopped game'
       end
 
       self.timer.stop
       self.save!
+    end
+
+    # game over
+    def over?
+      timer.over?
     end
 
     def add_word!(word)
@@ -88,9 +105,21 @@ module Boggle
     #----- Data
 
     def status
-      return 'over' if timer.over?
+      return 'over' if over?
       return 'running' if timer.running?
       nil
+    end
+
+    def attributes
+      {
+        id:               id,
+        dice_type:        dice_type,
+        board_size:       board_size,
+        game_length_secs: game_length_secs,
+        dice_string:      dice_string,
+        started_at:       timer.started_at,
+        stopped_at:       timer.stopped_at
+      }
     end
 
     def client_data

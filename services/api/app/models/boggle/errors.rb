@@ -5,8 +5,9 @@ module Boggle
     MissingToken  = Class.new(StandardError)
 
     # Game
-    GameNotFound = Class.new(StandardError)
-    GameIsOver   = Class.new(StandardError)
+    GameNotFound    = Class.new(StandardError)
+    GameNotStarted  = Class.new(StandardError)
+    GameIsOver      = Class.new(StandardError)
 
     # Dice
     ImpossibleDice = Class.new(StandardError)

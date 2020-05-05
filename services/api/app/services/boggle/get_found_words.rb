@@ -11,7 +11,7 @@ module Boggle
 
     def call
       # TODO
-      Boggle::Game.new
+      # Boggle::Game.new
 
       # raise Boggle::Errors::GameNotFound, 'Cannot find a game for a token'
     end
