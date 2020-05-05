@@ -19,6 +19,9 @@ module Boggle
     end
 
     def stop
+      return false if @started_at.nil?
+      return false unless @stopped_at.nil?
+
       @stopped_at = Time.now
     end
 

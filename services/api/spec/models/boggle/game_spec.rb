@@ -73,7 +73,7 @@ RSpec.describe Boggle::Game, type: :model do
         'stopped_at'        => '2020-05-05 16:28:30 +0000'
     } }
 
-    it 'returns an unserialized game model with correct attributes' do
+    it 'returns a game model with correct attributes' do
       allow(current_redis_instance).to receive(:hgetall).and_return serialized_content
       game = described_class.restore(id)
 

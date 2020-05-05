@@ -9,22 +9,6 @@ RSpec.describe Boggle::Timer, type: :model do
 
   subject { described_class.new(game_length_secs) }
 
-  before do
-    allow(Time).to receive(:now).and_return(started_at)
-  end
-
-  it 'starts the timer, when #start is called' do
-    subject.start
-    expect(subject.started_at).to eq started_at
-  end
-
-  it 'stops the timer, when #stop is called' do
-    allow(Time).to receive(:now).and_return(stopped_at)
-    subject.stop
-
-    expect(subject.stopped_at).to eq stopped_at
-  end
-
   describe 'timer has never been started' do
     # time is up - no time left
     it 'is up' do
@@ -42,20 +26,28 @@ RSpec.describe Boggle::Timer, type: :model do
     it 'shows 0 seconds_left left' do
       expect(subject.seconds_left).to eq 0
     end
+
+    it 'is impossible to stop it' do
+      expect(subject.stop).to eq false
+      expect(subject.stopped_at).to eq nil
+    end
   end
 
   describe 'timer was started' do
-    let(:seconds_ticked) { 1.second }
     before {
-      allow(Time).to receive(:now).and_return(Time.now + seconds_ticked)
+      allow(Time).to receive(:now).and_return(started_at)
       subject.start
     }
+
+    it 'has a correct "started_at"' do
+      expect(subject.started_at).to eq started_at
+    end
 
     it 'is up' do
       expect(subject.up?).to eq false
     end
 
-    it 'is running if it was started, not stopped and not yet ended' do
+    it 'is running if it was started, not stopped and is ticking (not expired)' do
       expect(subject.running?).to eq true
     end
 
@@ -88,11 +80,16 @@ RSpec.describe Boggle::Timer, type: :model do
       end
     end
 
-    context 'timer was stopped' do
+    context 'timer was started and then stopped' do
       before {
-        allow(Time).to receive(:now).and_return(Time.now + seconds_ticked)
+        subject.started_at = started_at
+        allow(Time).to receive(:now).and_return(stopped_at)
         subject.stop
       }
+
+      it 'has a correct "stopped_at"' do
+        expect(subject.stopped_at).to eq stopped_at
+      end
 
       it 'is up' do
         expect(subject.up?).to eq true
@@ -109,10 +106,18 @@ RSpec.describe Boggle::Timer, type: :model do
       it 'shows 0 seconds left' do
         expect(subject.seconds_left).to eq 0
       end
+
+      it 'is impossible to stop it again' do
+        subject.stopped_at = stopped_at
+        allow(Time).to receive(:now).and_return(Time.now + 10.seconds)
+        expect(subject.stop).to eq false
+        expect(subject.stopped_at).to eq stopped_at
+      end
     end
   end
 
   it 'returns client_data in a correct format' do
+    allow(Time).to receive(:now).and_return(started_at)
     subject.start
 
     allow(Time).to receive(:now).and_return(stopped_at)
