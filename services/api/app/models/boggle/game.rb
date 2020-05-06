@@ -49,7 +49,6 @@ module Boggle
     def add_word!(word)
       game_over_check!
 
-      # the game has never been started, so it should be impossible to add words
       unless timer.ticking?
         raise Boggle::Errors::GameIsNotRunning, 'Cannot add a word to a not running game'
       end
@@ -57,6 +56,12 @@ module Boggle
       # One cube is printed with "Qu".
       # This is because "q" is nearly always followed by "u" in English words.
       word = word.sub('q', 'qu') if word.include?('q') && !word.include?('qu')
+
+      # Boggle allows words of 2 chars, but won't give points for that.
+      # One-character words are not allowed
+      if word.length < 2
+        raise Boggle::Errors::WordIsTooShort, 'This word is too short'
+      end
 
       unless StringHelper.real_word? word
         raise Boggle::Errors::NotAWord, 'This word doesn\'t look like a real word'

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Boggle::GetGameResults do
-  let(:subject) { ->(words) { described_class.call(words: words) } }
+  let(:subject) { ->(words_with_scores) { described_class.call(words_with_scores: words_with_scores) } }
 
   describe '#call' do
     it 'returns 0 and empty array for empty array' do
@@ -11,26 +11,9 @@ RSpec.describe Boggle::GetGameResults do
     end
 
     it 'makes correct calculations' do
-      expect(subject[[
-      '',
-      'a',
-      'bb',
-      'ccc',
-      'dddd',
-      'eeeee',
-      'ffffff',
-      'ggggggg',
-      'hhhhhhhhh',
-      'iiiiiiiiii']]).to eq({ total_score: 34, words_with_scores:  [
-      'a:0',
-      'bb:0',
-      'ccc:1',
-      'dddd:1',
-      'eeeee:2',
-      'ffffff:3',
-      'ggggggg:5',
-      'hhhhhhhhh:11',
-      'iiiiiiiiii:11'] })
+      expect(subject[[['sentence', 11.0], ['point', 2.0], ['dot', 1.0]]]).to eq(
+        { total_score: 14,
+          words_with_scores: [['sentence', 11], ['point', 2], ['dot', 1]] })
     end
   end
 end

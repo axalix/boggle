@@ -27,7 +27,7 @@ RSpec.describe Boggle::Timer, type: :model do
     end
 
     it 'is impossible to stop it' do
-      expect(subject.stop).to eq false
+      expect(subject.stop).to eq nil
       expect(subject.stopped_at).to eq nil
     end
   end

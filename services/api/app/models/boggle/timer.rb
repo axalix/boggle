@@ -12,18 +12,18 @@ module Boggle
 
     def stop
       # can't stop a timer if it has never been started
-      return false unless started?
+      return nil unless started?
 
       # can't stop a timer if it is already stopped
       return @stopped_at if stopped?
 
       # it is naturally stopped
-      return false unless ticking?
+      return nil unless ticking?
 
       @stopped_at = Time.now
     end
 
-    # a diff between the length of the game and seconds pass. Zero if negative
+    # a diff between the length of the game and what is passed. Zero if negative
     def seconds_left
       # never started or stopped => no time left
       return 0 if !started? || stopped?

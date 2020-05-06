@@ -19,13 +19,13 @@ class GamesController < ApplicationController
   end
 
   def add_word
+    # TODO: word - "empty string" validation
     word = StringHelper.sanitize_and_lowercase(params.require(:word))
     game.add_word!(word)
     render :nothing
   end
 
   def get_results
-    @game = Boggle::Game.restore(game_token)
     game.stop!
     render json: game_results_data
   end
@@ -45,13 +45,9 @@ class GamesController < ApplicationController
   private def game_results_data
     # results could be cached / persisted too, so we won't recalculate them every time,
     # but I didn't do to save some time for the frontend part
-    {
-      id:           game.id,
-      board:        { size: game.board.size, dice_string: game.board.dice_string },
-      dice:         Boggle::Dice::TYPES[game.dice_type],
-      seconds_left: game.timer.seconds_left,
-      results:      Boggle::GetGameResults.call(words: game.found_words_list.get_all)
-    }
+    game_data
+      .without(:words)
+      .merge(results: Boggle::GetGameResults.call(words_with_scores: game.found_words_list.get_all(with_scores: true)))
   end
 
   private def set_game

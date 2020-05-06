@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Boggle::Game, type: :model do
-  let(:current_redis_instance) { instance_double(Redis) }
-
   let(:board_size) { 4 }
   let(:dice_type) { :classic_16 }
   let(:game_length_secs) { 180 }
@@ -17,17 +15,6 @@ RSpec.describe Boggle::Game, type: :model do
   let(:dice_chars) { 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw' }
   let(:dice_count) { 16 }
   let(:word) { 'apple' }
-
-  before do
-    allow(Redis).to receive(:current).and_return(current_redis_instance)
-    allow(current_redis_instance).to receive(:mapped_hmset)
-    allow(current_redis_instance).to receive(:expire)
-    allow(current_redis_instance).to receive(:exists)
-    allow(current_redis_instance).to receive(:hgetall)
-    allow(current_redis_instance).to receive(:multi)
-    allow(current_redis_instance).to receive(:sismember)
-    allow(current_redis_instance).to receive(:smembers)
-  end
 
   subject { described_class.new(
     id: id,
@@ -71,30 +58,29 @@ RSpec.describe Boggle::Game, type: :model do
   end
 
   describe '#restore' do
-    let(:serialized_content) { {
-        'id'                => 'Lob4mASJLvsbBK7gDCHP1w',
+    let(:serialized_game) { {
+        'id'                => id,
         'dice_type'         => 'classic_16',
         'board_size'        => '4',
         'game_length_secs'  => '100',
-        'dice_string'       => 'iaaaeerxetektiuw',
+        'dice_string'       => 'applepearorangex',
         'started_at'        => '2020-05-05 16:28:25 +0000',
         'stopped_at'        => '2020-05-05 16:28:30 +0000'
     } }
 
     it 'returns a game model with correct attributes' do
-      allow(current_redis_instance).to receive(:hgetall).and_return serialized_content
+      Redis.current.mapped_hmset("boggle:game:#{id}", serialized_game)
       game = described_class.restore(id)
 
       expect(game.dice_type).to eq :classic_16
       expect(game.board_size).to eq 4
       expect(game.game_length_secs).to eq 100
-      expect(game.board.dice_string).to eq 'iaaaeerxetektiuw'
+      expect(game.board.dice_string).to eq 'applepearorangex'
       expect(game.timer.started_at).to eq '2020-05-05 16:28:25 +0000'.to_time
       expect(game.timer.stopped_at).to eq '2020-05-05 16:28:30 +0000'.to_time
     end
 
     it 'it throws an exception if game does not exist' do
-      allow(current_redis_instance).to receive(:hgetall).and_return nil
       expect { described_class.restore(id) }.to raise_error(Boggle::Errors::GameNotFound)
     end
   end
@@ -138,6 +124,14 @@ RSpec.describe Boggle::Game, type: :model do
     }
 
     context 'adding a word' do
+      it 'it throws an exception if word is an empty string' do
+        expect { subject.add_word! '' }.to raise_error(Boggle::Errors::WordIsTooShort)
+      end
+
+      it 'it throws an exception if word is an one-char string' do
+        expect { subject.add_word! 'a' }.to raise_error(Boggle::Errors::WordIsTooShort)
+      end
+
       it 'it throws an exception if it is not a real word' do
         allow(StringHelper).to receive(:real_word?).and_return false
         expect { subject.add_word! word }.to raise_error(Boggle::Errors::NotAWord)
@@ -170,11 +164,7 @@ RSpec.describe Boggle::Game, type: :model do
       expect { subject.start! }.to raise_error(Boggle::Errors::GameIsOver)
     end
 
-    it 'it throws an exception, when trying to add a game' do
-      expect { subject.add_word!(word) }.to raise_error(Boggle::Errors::GameIsOver)
-    end
-
-    it 'it throws an exception if a game is not running' do
+    it 'it throws an exception, when trying to add a word' do
       expect { subject.add_word!(word) }.to raise_error(Boggle::Errors::GameIsOver)
     end
   end
@@ -185,13 +175,13 @@ RSpec.describe Boggle::Game, type: :model do
       expect(subject.over?).to eq false
     end
 
-    it 'is true if timer was started and stopped' do
+    it 'is true if timer was started and then stopped' do
       allow(subject.timer).to receive(:started?).and_return true
       allow(subject.timer).to receive(:stopped?).and_return true
       expect(subject.over?).to eq true
     end
 
-    it 'is true if timer was started never stopped, but not running' do
+    it 'is true if timer was started never stopped, but not ticking (naturally stopped)' do
       allow(subject.timer).to receive(:started?).and_return true
       allow(subject.timer).to receive(:stopped?).and_return false
       allow(subject.timer).to receive(:ticking?).and_return false

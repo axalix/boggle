@@ -19,6 +19,7 @@ module Boggle
 
     # Word
     WordAlreadyExists = Class.new(StandardError)
-    NotAWord = Class.new(StandardError)
+    NotAWord          = Class.new(StandardError)
+    WordIsTooShort    = Class.new(StandardError)
   end
 end

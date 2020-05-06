@@ -9,6 +9,9 @@ Boggle - a word game invented by Allan Turoff.
 One cube is printed with "Qu". This is because "q" is nearly always followed by "u" in English words.  
  
 [There are some exceptional rare words without "u" after "q"](https://en.wiktionary.org/wiki/Appendix:English_words_containing_Q_not_followed_by_U)   
+
+Boggle allows words of 2 chars, but won't give points for that. One-character words are not allowed. 
+
   
 ### How to play     
     
