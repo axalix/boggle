@@ -16,7 +16,6 @@ RSpec.describe Boggle::Game, type: :model do
   let(:dice_string) { 'abcdefghiklmnop' }
   let(:dice_chars) { 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw' }
   let(:dice_count) { 16 }
-  let(:status) { 'running' }
   let(:word) { 'apple' }
 
   before do
@@ -26,33 +25,32 @@ RSpec.describe Boggle::Game, type: :model do
     allow(current_redis_instance).to receive(:exists)
     allow(current_redis_instance).to receive(:hgetall)
     allow(current_redis_instance).to receive(:multi)
+    allow(current_redis_instance).to receive(:sismember)
+    allow(current_redis_instance).to receive(:smembers)
   end
 
   subject { described_class.new(
+    id: id,
     dice_type: dice_type,
     board_size: board_size,
     game_length_secs: game_length_secs
   ) }
 
-  describe 'instantiation' do
-    it 'returns a board of a correct size' do
+  describe 'game objects' do
+    it 'creates a board of a correct size' do
       expect(subject.board.size).to eq board_size
     end
 
-    it 'returns a dice of a correct type' do
+    it 'creates a dice of a correct type' do
       expect(subject.dice.type).to eq dice_type
     end
 
-    it 'returns a timer with a correct game length' do
+    it 'creates a timer with a correct game length' do
       expect(subject.timer.game_length_secs).to eq game_length_secs
     end
 
-    it 'returns a list of found words, linked to a game' do
-      expect(subject.found_words_list.game).to eq subject
-    end
-
-    it 'returns status = nil' do
-      expect(subject.status).to eq nil
+    it 'creates a list of found words, linked to a game' do
+      expect(subject.found_words_list.id).to eq id
     end
   end
 
@@ -95,80 +93,73 @@ RSpec.describe Boggle::Game, type: :model do
       expect(game.timer.stopped_at).to eq '2020-05-05 16:28:30 +0000'.to_time
     end
 
-    it 'it throws an exception if a game cannot be found in Redis' do
+    it 'it throws an exception if game does not exist' do
       allow(current_redis_instance).to receive(:hgetall).and_return nil
       expect { described_class.restore(id) }.to raise_error(Boggle::Errors::GameNotFound)
     end
   end
 
-  describe 'add_word!' do
-    it 'it throws an exception if a game is not running' do
-      allow(subject).to receive(:over?).and_return false
-      expect { subject.add_word!(word) }.to raise_error(Boggle::Errors::GameIsNotRunning)
+  describe 'starting a game' do
+    before {
+      allow(StringHelper).to receive(:random_token).and_return random_token
+    }
+
+    it 'assigns an "id"' do
+      subject.start!
+      expect(subject.id).to eq random_token
     end
 
-    it 'calls "found_words_list" model to add a word' do
-      allow(subject).to receive(:over?).and_return false
-      allow(subject.timer).to receive(:running?).and_return true
-      expect(subject.found_words_list).to receive(:add_word!).with(word)
-      subject.add_word! word
+    it 'rolls the dice' do
+      subject.start!
+      expect(subject.board.dice_string).to match(/[a-z]{#{dice_count}}/)
+    end
+
+    it 'initializes a list of found words' do
+      subject.start!
+      expect(subject.found_words_list.id).to eq id
+    end
+
+    it 'starts the timer' do
+      expect(subject.timer).to receive(:start)
+      subject.start!
+    end
+
+    it 'persists a game' do
+      expect(subject).to receive(:save!)
+      subject.start!
     end
   end
 
-  describe 'game is not over' do
-    before { allow(subject).to receive(:over?).and_return false }
+  describe 'game is running' do
+    before {
+      subject.start!
+      allow(subject).to receive(:over?).and_return false
+      allow(subject.timer).to receive(:ticking?).and_return true
+    }
 
-    context 'starting a game' do
-      before {
-        allow(StringHelper).to receive(:random_token).and_return random_token
-      }
-
-      it 'it throws an exception if a game is already running' do
-        allow(subject.timer).to receive(:running?).and_return true
-        expect { subject.start! }.to raise_error(Boggle::Errors::GameIsRunning)
+    context 'adding a word' do
+      it 'it throws an exception if it is not a real word' do
+        allow(StringHelper).to receive(:real_word?).and_return false
+        expect { subject.add_word! word }.to raise_error(Boggle::Errors::NotAWord)
       end
 
-      it 'assigns an "id"' do
-        subject.start!
-        expect(subject.id).to eq random_token
+      it 'it throws an exception if word cannot be found on a board' do
+        allow(StringHelper).to receive(:real_word?).and_return true
+        allow(subject.board).to receive(:has_word?).and_return false
+        expect { subject.add_word! word }.to raise_error(Boggle::Errors::BoardHasNoWord)
       end
+    end
 
-      it 'rolls the dice' do
-        subject.start!
-        expect(subject.board.dice_string).to match(/[a-z]{#{dice_count}}/)
-      end
-
-      it 'initializes a list of found words' do
-        expect(subject.found_words_list).to receive(:create!)
-        subject.start!
-      end
-
-      it 'starts the timer' do
-        expect(subject.timer).to receive(:start)
-        subject.start!
+    context 'when stopping a game' do
+      it 'stops the timer' do
+        expect(subject.timer).to receive(:stop)
+        subject.stop!
       end
 
       it 'persists a game' do
         expect(subject).to receive(:save!)
-        subject.start!
+        subject.stop!
       end
-
-      context 'stopping a game' do
-        it 'stops the timer' do
-          expect(subject.timer).to receive(:stop)
-          subject.stop!
-        end
-
-        it 'persists a game' do
-          expect(subject).to receive(:save!)
-          subject.stop!
-        end
-      end
-    end
-
-    it 'returns a "running" status if timer is still running' do
-      allow(subject.timer).to receive(:running?).and_return true
-      expect(subject.status).to eq :running
     end
   end
 
@@ -179,37 +170,49 @@ RSpec.describe Boggle::Game, type: :model do
       expect { subject.start! }.to raise_error(Boggle::Errors::GameIsOver)
     end
 
-    it 'it throws an exception, when stopping a game' do
-      expect { subject.stop! }.to raise_error(Boggle::Errors::GameIsOver)
-    end
-
     it 'it throws an exception, when trying to add a game' do
       expect { subject.add_word!(word) }.to raise_error(Boggle::Errors::GameIsOver)
     end
 
-    it 'returns status "over"' do
-      expect(subject.status).to eq :over
+    it 'it throws an exception if a game is not running' do
+      expect { subject.add_word!(word) }.to raise_error(Boggle::Errors::GameIsOver)
     end
   end
 
-  it 'detects the game is over, when timer is over' do
-    allow(subject.timer).to receive(:over?).and_return true
-    expect(subject.over?).to eq true
+  describe '#over?' do
+    it 'is false if timer has never been started' do
+      allow(subject.timer).to receive(:started?).and_return false
+      expect(subject.over?).to eq false
+    end
+
+    it 'is true if timer was started and stopped' do
+      allow(subject.timer).to receive(:started?).and_return true
+      allow(subject.timer).to receive(:stopped?).and_return true
+      expect(subject.over?).to eq true
+    end
+
+    it 'is true if timer was started never stopped, but not running' do
+      allow(subject.timer).to receive(:started?).and_return true
+      allow(subject.timer).to receive(:stopped?).and_return false
+      allow(subject.timer).to receive(:ticking?).and_return false
+      expect(subject.over?).to eq true
+    end
   end
 
-  it 'returns client_data in a correct format' do
-    subject.id = id
-
-    allow(subject.timer).to receive(:seconds_left).and_return seconds_left
-    allow(subject.board).to receive(:dice_string).and_return dice_string
-    allow(subject).to receive(:status).and_return status
-
-    expect(subject.client_data).to eq({
-      id:           id,
-      board:        { dice_string: dice_string, size: board_size },
-      dice:         { dice_chars: dice_chars, dice_count: dice_count },
-      seconds_left: seconds_left,
-      status:       status
-    })
-  end
+  # TODO
+  # it 'returns client_data in a correct format' do
+  #   subject.id = id
+  #
+  #   allow(subject.timer).to receive(:seconds_left).and_return seconds_left
+  #   allow(subject.board).to receive(:dice_string).and_return dice_string
+  #   allow(subject).to receive(:status).and_return status
+  #
+  #   expect(subject.client_data).to eq({
+  #     id:           id,
+  #     board:        { dice_string: dice_string, size: board_size },
+  #     dice:         { dice_chars: dice_chars, dice_count: dice_count },
+  #     seconds_left: seconds_left,
+  #     status:       status
+  #   })
+  # end
 end

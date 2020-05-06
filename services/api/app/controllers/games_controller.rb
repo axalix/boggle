@@ -25,7 +25,8 @@ class GamesController < ApplicationController
     render :nothing
   end
 
-  def stop
+  def get_results
+    @game = Boggle::Game.restore(game_token)
     @game.stop!
     render json: @game
   end

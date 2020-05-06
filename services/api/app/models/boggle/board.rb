@@ -11,14 +11,10 @@ module Boggle
     def has_word?(word)
       # One cube is printed with "Qu".
       # This is because "q" is nearly always followed by "u" in English words.
-      # There are some exceptional rare words without "u" after "q",
-      # but we will ignore them for the sake of simplicity.
-      # This is a list of such words:
-      # https://en.wiktionary.org/wiki/Appendix:English_words_containing_Q_not_followed_by_U
       Boggle::SearchBoardWord.call(
         dice_string:  dice_string,
         board_size:   size,
-        word:         word.sub('qu', 'q')
+        word:         word.sub('qu', 'q') # the board sees "qu" as "q"
       )
     end
 

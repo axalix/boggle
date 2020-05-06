@@ -11,35 +11,37 @@ module Boggle
     end
 
     def stop
-      return false if @started_at.nil?
-      return false unless @stopped_at.nil?
+      # can't stop a timer if it has never been started
+      return false unless started?
+
+      # can't stop a timer if it is already stopped
+      return @stopped_at if stopped?
+
+      # it is naturally stopped
+      return false unless ticking?
 
       @stopped_at = Time.now
     end
 
     # a diff between the length of the game and seconds pass. Zero if negative
     def seconds_left
-      return 0 if started_at.nil? || !stopped_at.nil?
+      # never started or stopped => no time left
+      return 0 if !started? || stopped?
+
       s = (Time.now - started_at).seconds
       s >= game_length_secs ? 0 : (game_length_secs - s).to_i
     end
 
-    # time is up if timer has never been started or 0 seconds left
-    def up?
-      return true if started_at.nil? || game_length_secs.nil?
-      seconds_left.zero?
+    def ticking?
+      seconds_left > 0
     end
 
-    # not manually stopped and not yet up
-    def running?
-      stopped_at.nil? && !up?
+    def started?
+      !!@started_at
     end
 
-    # Timer was running before, but not anymore
-    # This usually means the game is over.
-    # On case timer has never been started "over?" returns false
-    def over?
-      !started_at.nil? && !running?
+    def stopped?
+      !!@stopped_at
     end
 
     def client_data

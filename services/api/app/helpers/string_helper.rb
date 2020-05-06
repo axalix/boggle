@@ -10,6 +10,6 @@ module StringHelper
   end
 
   def self.real_word?(word)
-    !!DICTIONARY_REDIS.sismember('dict', word)
+    DICTIONARY_REDIS.sismember('dict', word)
   end
 end

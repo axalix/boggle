@@ -24,7 +24,9 @@ module Boggle
     end
 
     def found_words_list
-      @found_words_list ||= FoundWordsList.new(game: self)
+      # The list of found words is only available,
+      # if game was once started (and "id" was assigned)
+      @found_words_list ||= FoundWordsList.new(id: id)
     end
 
     #----- Persisting logic
@@ -62,11 +64,8 @@ module Boggle
     #----- Game flow
 
     def start!
+      return if timer.ticking?
       game_over_check!
-
-      if timer.running?
-        raise Boggle::Errors::GameIsRunning, 'Cannot restart a running game'
-      end
 
       self.tap do |g|
         g.id = StringHelper.random_token
@@ -77,30 +76,49 @@ module Boggle
     end
 
     def stop!
-      game_over_check!
-      self.timer.stop
-      self.save!
-    end
-
-    # game over
-    def over?
-      timer.over?
+      timer.stop
+      save!
     end
 
     def add_word!(word)
       game_over_check!
 
-      unless timer.running?
+      # the game has never been started, so it should be impossible to add words
+      unless timer.ticking?
         raise Boggle::Errors::GameIsNotRunning, 'Cannot add a word to a not running game'
+      end
+
+      # One cube is printed with "Qu".
+      # This is because "q" is nearly always followed by "u" in English words.
+      word = word.sub('q', 'qu') if word.include?('q') && !word.include?('qu')
+
+      unless StringHelper.real_word? word
+        raise Boggle::Errors::NotAWord, 'This word doesn\'t look like a real word'
+      end
+
+      unless board.has_word? word
+        raise Boggle::Errors::BoardHasNoWord, 'This word cannot be found on a board'
       end
 
       found_words_list.add_word! word
     end
 
     def status
-      return :over if over?
-      return :running if timer.running?
-      nil
+      # running, ended
+      return :running if timer.ticking?
+      :not_running
+    end
+
+    # game over
+    def over?
+      # game has never been started, so it's not over
+      return false unless timer.started?
+
+      # game was stopped
+      return true if timer.stopped?
+
+      # timer is not ticking
+      !timer.ticking?
     end
 
     #----- Data
@@ -117,19 +135,29 @@ module Boggle
       }
     end
 
-    def client_data
+    def client_data_for_ended_game
+      # results could be cached / persisted too, so we won't recalculate them every time,
+      # but I didn't do to save some time for the frontend part
       {
-        id:           id,
-        board:        board.client_data,
-        dice:         dice.client_data,
-        seconds_left: timer.seconds_left,
-        status:       status
+          id:           id,
+          board:        board.client_data,
+          dice:         dice.client_data,
+          seconds_left: timer.seconds_left,
+          status:       status,
+          results:      Boggle::GetGameResults.call(words: found_words_list.get_all_with_scores)
       }
     end
 
-    # def client_data_with_found_words
-    #   client_data.merge(found_words: found_words)
-    # end
+    def client_data_for_running_game
+      {
+          id:           id,
+          board:        board.client_data,
+          dice:         dice.client_data,
+          seconds_left: timer.seconds_left,
+          status:       status,
+          words:        found_words_list.get_all
+      }
+    end
 
     private def game_over_check!
       if over?

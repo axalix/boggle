@@ -2,12 +2,12 @@
 
 module Boggle
   class FoundWordsList < BoggleObject
-    attr_accessor :game
+    attr_accessor :id
 
-    validates :game, presence: true
+    validates :id, presence: true
 
     def redis_id
-      "boggle:words:#{game.id}"
+      "boggle:words:#{id}"
     end
 
     def create!
@@ -19,7 +19,7 @@ module Boggle
     end
 
     def save!(word)
-      r.sadd(redis_id, word)
+      Redis.current.sadd(redis_id, word)
     end
 
     def has_word?(word)
@@ -31,14 +31,6 @@ module Boggle
     end
 
     def add_word!(word)
-      unless StringHelper.real_word? word
-        raise Boggle::Errors::NotAWord, 'This word doesn\'t look like a real word'
-      end
-
-      unless game.board.has_word? word
-        raise Boggle::Errors::BoardHasNoWord, 'This word cannot be found on a board'
-      end
-
       if has_word? word
         raise Boggle::Errors::WordAlreadyExists, 'This word already exists in a list'
       end

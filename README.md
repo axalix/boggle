@@ -7,8 +7,8 @@ Boggle - a word game invented by Allan Turoff.
 ## Game rules and assumptions  
   
 One cube is printed with "Qu". This is because "q" is nearly always followed by "u" in English words.  
-There are some exceptional rare words without "u" after "q", but we will ignore them for the sake of simplicity.  
-[This is a list of such words](https://en.wiktionary.org/wiki/Appendix:English_words_containing_Q_not_followed_by_U)   
+ 
+[There are some exceptional rare words without "u" after "q"](https://en.wiktionary.org/wiki/Appendix:English_words_containing_Q_not_followed_by_U)   
   
 ### How to play     
     
