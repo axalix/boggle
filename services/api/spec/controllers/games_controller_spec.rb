@@ -30,7 +30,6 @@ RSpec.describe GamesController, type: :controller do
     allow(StringHelper).to receive(:real_word?).and_return true
   }
 
-
   describe 'game token is not sent' do
     context '#create' do
       it 'returns status 200' do
@@ -112,7 +111,7 @@ RSpec.describe GamesController, type: :controller do
         get :get_results
 
         game_data = JSON.parse(response.body)
-        expect(game_data['results']).to eq({'total_score' => 0, 'words_with_scores' => []})
+        expect(game_data['results']).to eq({ 'total_score' => 0, 'words_with_scores' => [] })
         expect(game_data).to include expected_game_data.without('words')
       end
 
@@ -120,7 +119,6 @@ RSpec.describe GamesController, type: :controller do
         get :get_results
         expect(JSON.parse(response.body)['seconds_left']).to eq 0
       end
-
     end
   end
 
