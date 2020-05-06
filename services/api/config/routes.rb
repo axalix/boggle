@@ -5,4 +5,6 @@ Rails.application.routes.draw do
   resource :game, only: [:show, :create]
 
   post '/game/word', to: 'games#add_word'
+
+  get '/game/results', to: 'games#get_results'
 end

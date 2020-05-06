@@ -43,13 +43,5 @@ module Boggle
     def stopped?
       !!@stopped_at
     end
-
-    def client_data
-      {
-          started_at: started_at,
-          stopped_at: stopped_at,
-          game_length_secs: game_length_secs
-      }
-    end
   end
 end

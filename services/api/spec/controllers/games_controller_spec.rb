@@ -24,6 +24,26 @@ RSpec.describe GamesController, type: :controller do
     end
   end
 
+  describe '#get_results' do
+  end
+
+  # TODO
+  # it 'returns client_data in a correct format' do
+  #   subject.id = id
+  #
+  #   allow(subject.timer).to receive(:seconds_left).and_return seconds_left
+  #   allow(subject.board).to receive(:dice_string).and_return dice_string
+  #   allow(subject).to receive(:status).and_return status
+  #
+  #   expect(subject.client_data).to eq({
+  #     id:           id,
+  #     board:        { dice_string: dice_string, size: board_size },
+  #     dice:         { dice_chars: dice_chars, dice_count: dice_count },
+  #     seconds_left: seconds_left,
+  #     status:       status
+  #   })
+  # end
+
   #-------------------------------------------
 
   private def expect_good_response(response)

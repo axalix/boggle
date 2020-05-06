@@ -85,7 +85,7 @@ RSpec.describe Boggle::Game, type: :model do
       allow(current_redis_instance).to receive(:hgetall).and_return serialized_content
       game = described_class.restore(id)
 
-      expect(game.dice_type).to eq 'classic_16'
+      expect(game.dice_type).to eq :classic_16
       expect(game.board_size).to eq 4
       expect(game.game_length_secs).to eq 100
       expect(game.board.dice_string).to eq 'iaaaeerxetektiuw'
@@ -198,21 +198,4 @@ RSpec.describe Boggle::Game, type: :model do
       expect(subject.over?).to eq true
     end
   end
-
-  # TODO
-  # it 'returns client_data in a correct format' do
-  #   subject.id = id
-  #
-  #   allow(subject.timer).to receive(:seconds_left).and_return seconds_left
-  #   allow(subject.board).to receive(:dice_string).and_return dice_string
-  #   allow(subject).to receive(:status).and_return status
-  #
-  #   expect(subject.client_data).to eq({
-  #     id:           id,
-  #     board:        { dice_string: dice_string, size: board_size },
-  #     dice:         { dice_chars: dice_chars, dice_count: dice_count },
-  #     seconds_left: seconds_left,
-  #     status:       status
-  #   })
-  # end
 end

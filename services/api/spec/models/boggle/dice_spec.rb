@@ -45,13 +45,6 @@ RSpec.describe Boggle::Dice, type: :model do
         end
       end
     end
-
-    it 'returns client_data in a correct format' do
-      expect(subject.client_data).to eq({
-        dice_chars: 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw',
-        dice_count: 16
-      })
-    end
   end
 
   it 'throws an exception if dice of unknown type is selected' do

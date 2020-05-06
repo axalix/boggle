@@ -44,9 +44,5 @@ module Boggle
 
       dt[:dice_chars][dice_number * DICE_EDGES_COUNT + rand(DICE_EDGES_COUNT)]
     end
-
-    def client_data
-      TYPES[@type]
-    end
   end
 end

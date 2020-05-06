@@ -7,28 +7,51 @@ class GamesController < ApplicationController
   attr_reader :game, :game_token
 
   def show
-    render json: @game.client_data_with_found_words
+    render json: game_data
   end
 
   def create
-    # # Player can only play one game at a time with the same token
-    # # In case previous game exists, it should be deleted
-    # Boggle::Game.delete!(game_token) if game_token
-    @game = Boggle::Game.new(:classic_16, 4, 10) # TODO: parameters
-    @game.start!
-    render json: @game.client_data
+    # TODO: parameters shouldn't be "magic numbers". Builders or factory calls are welcome here.
+    # I left it "as is" to save some time for frontend
+    @game = Boggle::Game.new(dice_type: :classic_16, board_size: 4, game_length_secs: 180)
+    game.start!
+    render json: game_data
   end
 
   def add_word
     word = StringHelper.sanitize_and_lowercase(params.require(:word))
-    @game.add_word!(word)
+    game.add_word!(word)
     render :nothing
   end
 
   def get_results
     @game = Boggle::Game.restore(game_token)
-    @game.stop!
-    render json: @game
+    game.stop!
+    render json: game_results_data
+  end
+
+  #-------------------
+
+  private def game_data
+    {
+      id:           game.id,
+      board:        { size: game.board.size, dice_string: game.board.dice_string },
+      dice:         Boggle::Dice::TYPES[game.dice_type],
+      seconds_left: game.timer.seconds_left,
+      words:        game.found_words_list.get_all
+    }
+  end
+
+  private def game_results_data
+    # results could be cached / persisted too, so we won't recalculate them every time,
+    # but I didn't do to save some time for the frontend part
+    {
+      id:           game.id,
+      board:        { size: game.board.size, dice_string: game.board.dice_string },
+      dice:         Boggle::Dice::TYPES[game.dice_type],
+      seconds_left: game.timer.seconds_left,
+      results:      Boggle::GetGameResults.call(words: game.found_words_list.get_all)
+    }
   end
 
   private def set_game

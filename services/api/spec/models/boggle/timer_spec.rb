@@ -91,18 +91,4 @@ RSpec.describe Boggle::Timer, type: :model do
       end
     end
   end
-
-  it 'returns client_data in a correct format' do
-    allow(Time).to receive(:now).and_return(started_at)
-    subject.start
-
-    allow(Time).to receive(:now).and_return(stopped_at)
-    subject.stop
-
-    expect(subject.client_data).to eq({
-        started_at: started_at,
-        stopped_at: stopped_at,
-        game_length_secs: game_length_secs
-    })
-  end
 end

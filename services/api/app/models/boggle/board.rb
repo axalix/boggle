@@ -17,12 +17,5 @@ module Boggle
         word:         word.sub('qu', 'q') # the board sees "qu" as "q"
       )
     end
-
-    def client_data
-      {
-          size: size,
-          dice_string: dice_string
-      }
-    end
   end
 end

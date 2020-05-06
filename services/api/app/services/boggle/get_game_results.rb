@@ -15,7 +15,7 @@ module Boggle
       words_with_scores = words.each_with_object([]) do |word, new_list|
         ws = word_score(word)
         total_score += ws
-        new_list << "#{word}:#{ws}"
+        new_list << "#{word}:#{ws}" unless word.empty?
       end
 
       {

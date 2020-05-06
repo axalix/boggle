@@ -22,7 +22,6 @@ RSpec.describe Boggle::GetGameResults do
       'ggggggg',
       'hhhhhhhhh',
       'iiiiiiiiii']]).to eq({ total_score: 34, words_with_scores:  [
-      ':0',
       'a:0',
       'bb:0',
       'ccc:1',

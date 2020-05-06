@@ -9,8 +9,6 @@ module Boggle
                   :board_size,
                   :game_length_secs
 
-    #----- Data-to-objects mapping
-
     def board
       @board ||= Boggle::Board.new(size: board_size)
     end
@@ -26,42 +24,9 @@ module Boggle
     def found_words_list
       # The list of found words is only available,
       # if game was once started (and "id" was assigned)
+      return nil unless id
       @found_words_list ||= FoundWordsList.new(id: id)
     end
-
-    #----- Persisting logic
-
-    def self.redis_id(id)
-      "boggle:game:#{id}"
-    end
-
-    def save!
-      @id = StringHelper.random_token unless id
-      rid = Boggle::Game.redis_id(id)
-      Redis.current.mapped_hmset(rid, attributes)
-      Redis.current.expire(rid, FORGET_GAME_AFTER_SECONDS)
-    end
-
-    def self.exists?(id)
-      Redis.current.exists(Boggle::Game.redis_id(id))
-    end
-
-    def self.restore(id)
-      persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
-      raise Boggle::Errors::GameNotFound unless persisted
-
-      self.new(
-        dice_type:        persisted['dice_type'].to_s,
-        board_size:       persisted['board_size'].to_i,
-        game_length_secs: persisted['game_length_secs'].to_i
-      ).tap do |g|
-        g.board.dice_string = persisted['dice_string']
-        g.timer.started_at  = persisted['started_at'].to_time
-        g.timer.stopped_at  = persisted['stopped_at'] == '' ? nil : persisted['stopped_at'].to_time
-      end
-    end
-
-    #----- Game flow
 
     def start!
       return if timer.ticking?
@@ -73,9 +38,10 @@ module Boggle
         g.found_words_list.create!
         g.timer.start
       end.save!
-    end
+     end
 
     def stop!
+      return if timer.stopped?
       timer.stop
       save!
     end
@@ -103,65 +69,56 @@ module Boggle
       found_words_list.add_word! word
     end
 
-    def status
-      # running, ended
-      return :running if timer.ticking?
-      :not_running
-    end
-
     # game over
     def over?
       # game has never been started, so it's not over
       return false unless timer.started?
 
-      # game was stopped
-      return true if timer.stopped?
-
-      # timer is not ticking
       !timer.ticking?
     end
 
-    #----- Data
-
-    def attributes
-      {
-        id:               id,
-        dice_type:        dice_type,
-        board_size:       board_size,
-        game_length_secs: game_length_secs,
-        dice_string:      board.dice_string,
-        started_at:       timer.started_at,
-        stopped_at:       timer.stopped_at
-      }
-    end
-
-    def client_data_for_ended_game
-      # results could be cached / persisted too, so we won't recalculate them every time,
-      # but I didn't do to save some time for the frontend part
-      {
-          id:           id,
-          board:        board.client_data,
-          dice:         dice.client_data,
-          seconds_left: timer.seconds_left,
-          status:       status,
-          results:      Boggle::GetGameResults.call(words: found_words_list.get_all_with_scores)
-      }
-    end
-
-    def client_data_for_running_game
-      {
-          id:           id,
-          board:        board.client_data,
-          dice:         dice.client_data,
-          seconds_left: timer.seconds_left,
-          status:       status,
-          words:        found_words_list.get_all
-      }
-    end
-
     private def game_over_check!
-      if over?
-        raise Boggle::Errors::GameIsOver, 'The game is over'
+      raise Boggle::Errors::GameIsOver, 'The game is over' if over?
+    end
+
+    #----- Persisting logic
+
+    def self.redis_id(id)
+      "boggle:game:#{id}"
+    end
+
+    def save!
+      @id = StringHelper.random_token unless id
+      rid = Boggle::Game.redis_id(id)
+      Redis.current.mapped_hmset(rid, {
+          id:               id,
+          dice_type:        dice_type,
+          board_size:       board_size,
+          game_length_secs: game_length_secs,
+          dice_string:      board.dice_string,
+          started_at:       timer.started_at,
+          stopped_at:       timer.stopped_at
+      })
+      Redis.current.expire(rid, FORGET_GAME_AFTER_SECONDS)
+    end
+
+    def self.exists?(id)
+      Redis.current.exists(Boggle::Game.redis_id(id))
+    end
+
+    def self.restore(id)
+      persisted = Redis.current.hgetall(Boggle::Game.redis_id(id))
+      raise Boggle::Errors::GameNotFound if persisted.nil? || persisted.empty?
+
+      self.new(
+        dice_type:        persisted['dice_type'].to_sym,
+        board_size:       persisted['board_size'].to_i,
+        game_length_secs: persisted['game_length_secs'].to_i
+      ).tap do |g|
+        g.id = persisted['id']
+        g.board.dice_string = persisted['dice_string']
+        g.timer.started_at  = persisted['started_at'].to_time
+        g.timer.stopped_at  = persisted['stopped_at'] == '' ? nil : persisted['stopped_at'].to_time
       end
     end
   end
