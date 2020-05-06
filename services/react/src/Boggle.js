@@ -6,7 +6,7 @@ import FoundWordsList from "./components/FoundWordsList";
 import Timer from "./components/Timer";
 import AddWord from "./components/AddWord";
 import WorkflowButton from "./components/WorkflowButton";
-import ResultFoundWordsList from "./components/ResultFoundWordsList";
+import Results from "./components/Results";
 
 
 function string_to_board(str, size)
@@ -25,8 +25,9 @@ function Boggle() {
   const list = ['apple', 'pear', 'watermelon'];
   const results = {
     total_score: 14,
-    words_with_scores: [['apple', 5], ['pear', 4], ['watermelon', 11]]
+    words_with_scores: [['apple', 2], ['pear', 1], ['watermelon', 11]]
   };
+  const game_length_secs = 77
 
   return (
     <div className="Boggle">
@@ -37,10 +38,13 @@ function Boggle() {
         <br/>FoundWordsList:
         <FoundWordsList list={list} />
 
-        <br/>ResultFoundWordsList:
-        <ResultFoundWordsList results={results} />
-        <Timer name="this is a timer" />
-        <AddWord name="this is an ad word" />
+        <br/>Results:
+        <Results results={results} />
+
+        <br/>Timer:
+        <Timer game_length_secs={game_length_secs} />
+
+        <AddWord name="this is an add word" />
         <WorkflowButton name="this is a workflow button" />
       </header>
     </div>
