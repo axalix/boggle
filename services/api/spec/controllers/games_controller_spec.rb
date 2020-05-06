@@ -89,9 +89,14 @@ RSpec.describe GamesController, type: :controller do
         expect(response.content_type).to eq 'text/plain; charset=utf-8'
       end
 
-      it 'returns status 422 and an error about a short word' do
+      it 'returns status 422 and an error about an empty word' do
         post :add_word, params: { word: '' }
         expect_error_response(response, '{"message":"param is missing or the value is empty: word"}')
+      end
+
+      it 'returns status 422 and an error about a short word' do
+        post :add_word, params: { word: 'a' }
+        expect_error_response(response, '{"message":"This word is too short"}')
       end
 
       it 'returns status 422 and an error about the game is over' do

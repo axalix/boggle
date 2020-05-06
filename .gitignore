@@ -21,3 +21,5 @@
 
 /services/dictionary/appendonly.aof
 /services/dictionary/dump.rdb
+/services/react/node_modules/*
+/services/react/build/*
