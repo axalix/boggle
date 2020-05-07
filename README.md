@@ -4,6 +4,10 @@ Boggle - a word game invented by Allan Turoff.
     
 ## How to install TODO    
      
+1. docker-compose build
+2. docker-compose up -d
+3. the game should be available in a browser here: http://localhost:3001/
+     
 ## Game rules and assumptions  
   
 One cube is printed with "Qu". This is because "q" is nearly always followed by "u" in English words.  
@@ -28,10 +32,13 @@ http://www.bananagrammer.com/2013/10/the-boggle-cube-redesign-and-its-effect.htm
       
 Another custom one "fancy" was added for 5x5 boards and it has next chars distribution:    
   
- AACIO   CELRS   NOSWD   NTVEH   GNABB   WCIMO    TABIL   ADENV   KNOTU   INPSE   JOOAC   TUDEI    
-    TYABJ   ZAHMO   EEFHI   LPSTU   HOPSA   LRXDE    
-    MOQAC   RSBIF   YEGKL   GILRU   FFKPS   LRVYD    
-    DEMPA   ORXDE   UYEGI   WAAEE   AOOTT   ISTTY  
+    AACIOT   ADENVZ   EEFHIY   GILRUW   AOOTTW
+    ABILTY   AHMORS   EGKLUY   AAEEGN   CIMOTU
+    ABJMOQ   BIFORX   EGINTV   ABBJOO   DEILRX
+    ACDEMP   DENOSW   EHINPS   ACHOPS   DELRVY
+    ACELRS   DKNOTU   ELPSTU   AFFKPS   DISTTY
+  
+  
   
   ## Requirements    
  ### Functional:    
