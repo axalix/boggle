@@ -10,10 +10,37 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #d6d6d6;
   padding: 20px;
 }
 
 .Boggle-link {
   color: #61dafb;
+}
+
+button {
+  box-shadow:inset 0px 1px 0px 0px #fff6af;
+  background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
+  background-color:#ffec64;
+  display:inline-block;
+  cursor:pointer;
+  color:#333333;
+  font-size:15px;
+  font-weight: 600;
+  padding:6px;
+  text-decoration:none;
+  border: 1px solid #282828;
+  outline:none;
+}
+
+button:active {
+  position:relative;
+  top:1px;
+}
+
+input {
+  border: 1px solid #231407;
+  font-size:15px;
+  padding: 6px;
+  margin: 0 5px 0 5px;
 }

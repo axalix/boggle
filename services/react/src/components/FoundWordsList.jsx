@@ -15,7 +15,7 @@ const FoundWordsList = props => {
   return (
     <table style={TableStyle}>
       <tbody>
-      {props.list.reverse().map(row =>
+      {props.list.map(row =>
         <tr key={'r' + row}>
             <td key={'c' + row} style={TdStyle}>{row}</td>
         </tr>

@@ -6,7 +6,7 @@ const TableStyle = {
 };
 
 const TdStyle = {
-  border: '1px solid green',
+  border: '1px solid grey',
   padding: '5px',
   fontSize: '10pt'
 };
@@ -14,7 +14,7 @@ const TdStyle = {
 const Results = props => {
   return (
     <React.Fragment>
-      <b style={{color: 'gold'}}>Total Score: {props.results['total_score']}</b>
+      <b style={{color: 'GoldenRod'}}>Total Score: {props.results['total_score']}</b>
       <table style={TableStyle}>
         <tbody>
         {props.results['words_with_scores'].map(row =>
