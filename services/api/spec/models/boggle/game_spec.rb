@@ -132,6 +132,10 @@ RSpec.describe Boggle::Game, type: :model do
         expect { subject.add_word! 'a' }.to raise_error(Boggle::Errors::WordIsTooShort)
       end
 
+      it 'it throws an exception if word is a two-char string' do
+        expect { subject.add_word! 'ab' }.to raise_error(Boggle::Errors::WordIsTooShort)
+      end
+
       it 'it throws an exception if it is not a real word' do
         allow(StringHelper).to receive(:real_word?).and_return false
         expect { subject.add_word! word }.to raise_error(Boggle::Errors::NotAWord)

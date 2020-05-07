@@ -77,3 +77,10 @@ input {
   align-items: center;
   width: 100%
 }
+
+.Boggle-rules {
+  font-size: 17px;
+  padding: 10px;
+  text-align: left;
+  line-height: 1.5;
+}

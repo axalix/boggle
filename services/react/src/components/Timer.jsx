@@ -14,11 +14,13 @@ export default class Timer extends Component {
     this.myInterval = setInterval(() => {
       const {seconds} = this.state;
 
-      if (seconds > 0) {
-        return this.setState(({seconds}) => ({seconds: seconds - 1}));
+      if (seconds > 1) {
+        this.setState(({seconds}) => ({seconds: seconds - 1}));
+        return
       }
 
-      clearInterval(this.myInterval)
+      this.props.trigger_stop();
+      clearInterval(this.myInterval);
     }, 1000)
   }
 
@@ -33,9 +35,8 @@ export default class Timer extends Component {
 
     return (
       <div style={DivStyle}>
-        {seconds === 0
-          ? <b>Game over!</b>
-          : <b>Time Left: {m === 0 ? `${s}s` : `${m}:${(s < 10 ? '0' : '')}${s}`}</b>
+        {
+          <b>Time Left: {m === 0 ? `${s}s` : `${m}:${(s < 10 ? '0' : '')}${s}`}</b>
         }
       </div>
     )

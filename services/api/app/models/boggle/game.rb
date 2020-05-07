@@ -57,9 +57,9 @@ module Boggle
       # This is because "q" is nearly always followed by "u" in English words.
       word = word.sub('q', 'qu') if word.include?('q') && !word.include?('qu')
 
-      # Boggle allows words of 2 chars, but won't give points for that.
+      # Boggle allows words of 3 chars, but won't give points for that.
       # One-character words are not allowed
-      if word.length < 2
+      if word.length < 3
         raise Boggle::Errors::WordIsTooShort, 'This word is too short'
       end
 

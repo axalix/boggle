@@ -51,12 +51,24 @@ RSpec.describe Boggle::Timer, type: :model do
     end
 
     it 'shows seconds left' do
-      allow(Time).to receive(:now).and_return(subject.started_at + game_length_secs - 1.second)
+      allow(Time).to receive(:now).and_return(subject.started_at + game_length_secs)
       expect(subject.seconds_left).to eq 1
     end
 
     context 'last second is reached' do
       before { allow(Time).to receive(:now).and_return(Time.now + game_length_secs.seconds) }
+
+      it 'is still running' do
+        expect(subject.ticking?).to eq true
+      end
+
+      it 'shows 1 seconds left' do
+        expect(subject.seconds_left).to eq 1
+      end
+    end
+
+    context 'time is up' do
+      before { allow(Time).to receive(:now).and_return(Time.now + game_length_secs.seconds + 1.second) }
 
       it 'is not running' do
         expect(subject.ticking?).to eq false

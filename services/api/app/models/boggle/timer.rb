@@ -29,7 +29,7 @@ module Boggle
       return 0 if !started? || stopped?
 
       s = (Time.now - started_at).seconds
-      s >= game_length_secs ? 0 : (game_length_secs - s).to_i
+      s > game_length_secs ? 0 : (game_length_secs - s + 1).to_i
     end
 
     def ticking?
