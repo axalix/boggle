@@ -8,7 +8,7 @@ const TableStyle = {
 const TdStyle = {
   border: '1px solid #383838',
   padding: '5px',
-  fontSize: '10pt'
+  fontSize: '12pt'
 };
 
 const FoundWordsList = props => {

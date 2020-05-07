@@ -42,6 +42,8 @@ export default class Boggle extends Component {
     return result;
   }
 
+  // Next 4 methods could be done with a help of Redux.
+  // I didn't do that to save some time for a better backend.
   componentDidMount() {
     const game_id = localStorage.getItem('game_id');
     if (game_id) {

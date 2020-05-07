@@ -10,7 +10,13 @@ const CancelButtonStyle = {
 const AddWord = ({ add_wrod }) => {
   const [word, setWord] = useState('');
 
-  const notiftyGame = (word) => {
+  const notiftyGame = (e, word) => {
+    if (e.key && e.key !== 'Enter') {
+      return
+    } else {
+      e.preventDefault();
+    }
+
     word = word.replace(/[^a-zA-Z]+/g, '');
     if (word === '') {
       setWord('');
@@ -30,8 +36,9 @@ const AddWord = ({ add_wrod }) => {
         value={word}
         placeholder="Enter a word"
         onChange={e => setWord(e.target.value)}
+        onKeyDown={(e) => notiftyGame(e, word)}
       />
-      <button type="button" onClick={(e) => notiftyGame(word)}>
+      <button type="button" onClick={(e) => notiftyGame(e, word)}>
         Add
       </button>
     </form>
