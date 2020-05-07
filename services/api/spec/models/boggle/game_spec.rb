@@ -136,15 +136,15 @@ RSpec.describe Boggle::Game, type: :model do
         expect { subject.add_word! 'ab' }.to raise_error(Boggle::Errors::WordIsTooShort)
       end
 
-      it 'it throws an exception if it is not a real word' do
-        allow(StringHelper).to receive(:real_word?).and_return false
-        expect { subject.add_word! word }.to raise_error(Boggle::Errors::NotAWord)
-      end
-
       it 'it throws an exception if word cannot be found on a board' do
-        allow(StringHelper).to receive(:real_word?).and_return true
         allow(subject.board).to receive(:has_word?).and_return false
         expect { subject.add_word! word }.to raise_error(Boggle::Errors::BoardHasNoWord)
+      end
+
+      it 'it throws an exception if it is not a real word' do
+        allow(subject.board).to receive(:has_word?).and_return true
+        allow(StringHelper).to receive(:real_word?).and_return false
+        expect { subject.add_word! word }.to raise_error(Boggle::Errors::NotAWord)
       end
     end
 
