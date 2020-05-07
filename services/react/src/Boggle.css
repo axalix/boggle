@@ -50,12 +50,12 @@ input {
   width: 40%
 }
 
-.column1 {
+.left_column {
   text-align: center;
   flex: 50%;
 }
 
-.column2 {
+.right_column {
   flex: 50%
 }
 

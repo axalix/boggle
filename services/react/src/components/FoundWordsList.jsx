@@ -15,9 +15,9 @@ const FoundWordsList = props => {
   return (
     <table style={TableStyle}>
       <tbody>
-      {props.list.map(row =>
-        <tr key={'r' + row}>
-            <td key={'c' + row} style={TdStyle}>{row}</td>
+      {props.list.map((row, index) =>
+        <tr key={index}>
+            <td key={index} style={TdStyle}>{row}</td>
         </tr>
       )}
       </tbody>

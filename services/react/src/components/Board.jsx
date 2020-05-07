@@ -17,10 +17,10 @@ const Board = props => {
   return (
     <table style={TableStyle}>
       <tbody>
-        {props.table.map(row =>
-          <tr key={row.join('')}>
-            {row.map(col =>
-              <td style={TdStyle} key={row.join('') + col}>{col.toUpperCase().replace('Q', 'Qu')}</td>
+        {props.table.map((row, index) =>
+          <tr key={index}>
+            {row.map((col, index) =>
+              <td style={TdStyle} key={index}>{col.toUpperCase().replace('Q', 'Qu')}</td>
             )}
           </tr>
         )}

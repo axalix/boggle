@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import axios from 'axios';
 
 import './Boggle.css';
 import Board from "./components/Board";
@@ -6,25 +7,27 @@ import FoundWordsList from "./components/FoundWordsList";
 import Timer from "./components/Timer";
 import AddWord from "./components/AddWord";
 import WorkflowButton from "./components/WorkflowButton";
-import Results from "./components/Results";
 import MessageBlock from "./components/MessageBlock";
+import Results from "./components/Results";
 
 
 export default class Boggle extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      table: this.string_to_board('Qbcdefghijklmnop', 4),
-      list: ['apple', 'pear', 'watermelon'],
+      game_token: null,
+      status: 'welcome',
+      table: this.string_to_board('****************', 4),
+      list: [],
       results: {
-        total_score: 14,
-        words_with_scores: [['apple', 2], ['pear', 1], ['watermelon', 11]]
+        total_score: 0,
+        words_with_scores: []
       },
       game_length_secs: 77,
-      workflow_button: 'Start',
       message: {
-        type: 'Notification',
-        text: 'd'
+        type: '',
+        text: ''
       }
     };
   }
@@ -32,41 +35,101 @@ export default class Boggle extends Component {
   string_to_board(str, size) {
     str = str.split('');
     const result = [];
-    while(str.length) {
+    while (str.length) {
       result.push(str.splice(0, size));
     }
 
     return result;
   }
 
-  loginCallback(word) {
-    this.setState(prevState => ({
-      list: [word,...prevState.list]
-    }))
+  addWordCallback(word) {
+    this.setState({message: {type: '', text: ''}});
+    axios.post('http://localhost:3000/game/word', {word: word}, {headers: {'Game-Token': this.state.game_token}})
+      .then(res => {
+        this.setState(prevState => ({
+          list: [word, ...prevState.list]
+        }))
+      }).catch((error) => {
+      this.setState({message: {type: 'Error', text: error.response.data.message}});
+    });
   }
+
+  stop() {
+    this.setState({message: {type: '', text: ''}});
+    axios.get('http://localhost:3000/game/results', {headers: {'Game-Token': this.state.game_token}})
+      .then(res => {
+        this.setState({
+          status: 'ended',
+          results: res.data.results
+        })
+      }).catch((error) => {
+      this.setState({message: {type: 'Error', text: error.response.data.message}});
+    });
+
+  }
+
+  start() {
+    this.setState({message: {type: '', text: ''}});
+    axios.post('http://localhost:3000/game', {})
+      .then(res => {
+        this.setState({
+          status: 'running',
+          game_token: res.data.id,
+          table: this.string_to_board(res.data.board.dice_string, 4),
+          list: [],
+          results: {
+            total_score: 0,
+            words_with_scores: []
+          },
+          game_length_secs: res.data.seconds_left,
+          message: {
+            type: 'Notification',
+            text: ''
+          }
+        })
+      })
+  }
+
+  triggerSatus = () => {
+    if (this.state.status === 'running') {
+      this.stop()
+    } else {
+      this.start()
+    }
+  };
 
   render() {
     return (
       <div className="Boggle">
         <header className="Boggle-header">
           BOGGLE
-          <Timer game_length_secs={this.state.game_length_secs} />
 
-          <MessageBlock message={this.state.message} />
+          {this.state.status === 'running' &&
+          <Timer status={this.state.status} game_length_secs={this.state.game_length_secs}/>}
+
+          <MessageBlock message={this.state.message}/>
 
           <div className="row">
-            <div className="column1">
-              <Board table={this.state.table} />
-              <WorkflowButton caption={this.state.workflow_button} />
+
+            <div className="left_column">
+              <Board table={this.state.table}/>
+              <WorkflowButton status={this.state.status} trigger_status={() => this.triggerSatus}/>
             </div>
-            <div className="column2">
-              <AddWord add_wrod={(word) => this.loginCallback(word)} />
 
-              <FoundWordsList list={this.state.list} />
+            <div className="right_column">
+              {this.state.status === 'running' &&
+              <React.Fragment>
+                <AddWord add_wrod={(word) => this.addWordCallback(word)}/>
 
-              {/*<Results results={this.state.results} />*/}
+                <FoundWordsList list={this.state.list}/>
 
+              </React.Fragment>}
+
+              {this.state.status === 'ended' &&
+              <Results results={this.state.results} />
+              }
             </div>
+
           </div>
         </header>
       </div>

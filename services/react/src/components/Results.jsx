@@ -1,5 +1,9 @@
 import React from 'react';
 
+const HeaderStyle = {
+  color: 'GoldenRod'
+};
+
 const TableStyle = {
   borderCollapse: 'collapse',
   margin: '0 auto'
@@ -14,7 +18,7 @@ const TdStyle = {
 const Results = props => {
   return (
     <React.Fragment>
-      <b style={{color: 'GoldenRod'}}>Total Score: {props.results['total_score']}</b>
+      <b style={HeaderStyle}>Total Score: {props.results['total_score']}</b>
       <table style={TableStyle}>
         <tbody>
         {props.results['words_with_scores'].map(row =>

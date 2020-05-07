@@ -12,8 +12,8 @@ const WorkflowButtonStyle = {
 const WorkflowButton = props => {
   return (
     <form>
-      <button type="button" style={WorkflowButtonStyle}>
-        {props.caption}
+      <button type="button" style={WorkflowButtonStyle} onClick={props.trigger_status()}>
+        {props.status === 'running' ? 'Stop' : 'Start'}
       </button>
     </form>
   );
