@@ -2,7 +2,7 @@ import React from 'react';
 
 const TableStyle = {
   borderCollapse: 'collapse',
-  margin: '20px'
+  margin: '0 auto'
 };
 
 const TdStyle = {

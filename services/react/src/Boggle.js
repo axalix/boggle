@@ -24,7 +24,7 @@ export default class Boggle extends Component {
       workflow_button: 'Start',
       message: {
         type: 'Notification',
-        text: 'Boggle'
+        text: 'd'
       }
     };
   }
@@ -49,26 +49,25 @@ export default class Boggle extends Component {
     return (
       <div className="Boggle">
         <header className="Boggle-header">
-          <br/>Board:
-          <Board table={this.state.table} />
-
-          <br/>FoundWordsList:
-          <FoundWordsList list={this.state.list} />
-
-          <br/>Results:
-          <Results results={this.state.results} />
-
-          <br/>Timer:
+          BOGGLE
           <Timer game_length_secs={this.state.game_length_secs} />
 
-          <br/>AddWord:
-          <AddWord add_wrod={(word) => this.loginCallback(word)} />
-
-          <br/>WorkflowButton:
-          <WorkflowButton caption={this.state.workflow_button} />
-
-          <br/>MessageBlock:
           <MessageBlock message={this.state.message} />
+
+          <div className="row">
+            <div className="column1">
+              <Board table={this.state.table} />
+              <WorkflowButton caption={this.state.workflow_button} />
+            </div>
+            <div className="column2">
+              <AddWord add_wrod={(word) => this.loginCallback(word)} />
+
+              <FoundWordsList list={this.state.list} />
+
+              {/*<Results results={this.state.results} />*/}
+
+            </div>
+          </div>
         </header>
       </div>
     );

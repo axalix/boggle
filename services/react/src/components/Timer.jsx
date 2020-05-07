@@ -1,5 +1,9 @@
 import React, {Component} from 'react'
 
+const DivStyle = {
+  margin: '10px 0 10px'
+};
+
 export default class Timer extends Component {
   constructor(props) {
     super(props);
@@ -28,12 +32,12 @@ export default class Timer extends Component {
     const s = seconds % 60;
 
     return (
-      <span>
+      <div style={DivStyle}>
         {seconds === 0
           ? <b>Game over!</b>
           : <b>Time Left: {m === 0 ? `${s}s` : `${m}:${(s < 10 ? '0' : '')}${s}`}</b>
         }
-      </span>
+      </div>
     )
   }
 }
