@@ -30,7 +30,7 @@ module Boggle
     def roll_all
       result = []
       0.upto(TYPES[type][:dice_count] - 1) { |dice_number| result << self.roll(dice_number) }
-      result.join
+      result.shuffle.join
     end
 
     # This method returns a random character for a dice with a particular number, depending on a chars set

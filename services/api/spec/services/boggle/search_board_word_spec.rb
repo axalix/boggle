@@ -29,7 +29,7 @@ RSpec.describe Boggle::SearchBoardWord do
 
     #--------- All-"a" board
 
-    context '4x4 board filled with the same symbol' do
+    context '4 x 4 board filled with the same symbol' do
       let(:board_size) { 4 }
       let(:dice_string) { 'aaaaaaaaaaaaaaaa' } # 16a
 

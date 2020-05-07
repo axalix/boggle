@@ -14,11 +14,11 @@ RSpec.describe Boggle::Timer, type: :model do
       expect(subject.ticking?).to eq false
     end
 
-    it 'started? is false' do
+    it '#started? is false' do
       expect(subject.started?).to eq false
     end
 
-    it 'stopped? is false' do
+    it '#stopped? is false' do
       expect(subject.stopped?).to eq false
     end
 
@@ -32,7 +32,7 @@ RSpec.describe Boggle::Timer, type: :model do
     end
   end
 
-  describe 'timer was started' do
+  describe 'timer was started and not stopped' do
     before {
       allow(Time).to receive(:now).and_return(started_at)
       subject.start
@@ -46,8 +46,12 @@ RSpec.describe Boggle::Timer, type: :model do
       expect(subject.ticking?).to eq true
     end
 
-    it 'started? is true' do
+    it '#started? is true' do
       expect(subject.started?).to eq true
+    end
+
+    it '#stopped? is false' do
+      expect(subject.stopped?).to eq false
     end
 
     it 'shows seconds left' do
@@ -90,7 +94,11 @@ RSpec.describe Boggle::Timer, type: :model do
         expect(subject.stopped_at).to eq stopped_at
       end
 
-      it 'stopped? is true' do
+      it '#started? is true' do
+        expect(subject.started?).to eq true
+      end
+
+      it '#stopped? is true' do
         expect(subject.stopped?).to eq true
       end
 

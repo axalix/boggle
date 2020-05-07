@@ -46,7 +46,7 @@ RSpec.describe Boggle::FoundWordsList, type: :model do
     expect(subject.has_word?(word)).to eq true
   end
 
-  it 'returns a unique list of saved words for #get_all, except the first one' do
+  it 'returns a unique list of saved words for #get_all' do
     # First value is '*' is added to hold a key.
     # This allows to set "r.expire" only once for a Redis key,
     # instead of each time, when the word is added
@@ -54,7 +54,7 @@ RSpec.describe Boggle::FoundWordsList, type: :model do
     expect(subject.get_all).to eq [word, word2, word3]
   end
 
-  it 'returns a unique list of saved words with points for #get_all' do
+  it 'returns a unique list of saved words with scores for each words for #get_all' do
     ['*', word, word2, word3, word, word2].map { |w| redis.zadd(rid, StringHelper.word_boggle_score(w), w) }
     expect(subject.get_all(with_scores: true)).to eq [['sentence', 11.0], ['point', 2.0], ['dot', 1.0]]
   end

@@ -41,7 +41,7 @@ RSpec.describe Boggle::Dice, type: :model do
 
       it 'returns a correct set of characters for each dice' do
         with_an_alphabetical_set do
-          expect(subject.roll_all).to eq 'abcdefghijklmnop'
+          expect(subject.roll_all.chars.sort.join).to eq 'abcdefghijklmnop'
         end
       end
     end

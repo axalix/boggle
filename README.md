@@ -76,8 +76,9 @@ TODO
   
     
 ## Some useful commands      
-- `rubocop` - to be sure the code follows the styling.       
+- `docker exec -it boggle_api bundle exec rubocop` - to be sure the code follows the styling.       
    (RuboCop configuration which has the same code style checking as official Ruby on Rails.      
    see *rubocop-rails_config*)      
        
-- `bundle exec guard` - live coding quality assessment.
+       
+- `docker exec -it boggle_api bundle exec rspec -fd` - to run tests

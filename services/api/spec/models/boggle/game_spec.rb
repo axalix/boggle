@@ -90,7 +90,7 @@ RSpec.describe Boggle::Game, type: :model do
       allow(StringHelper).to receive(:random_token).and_return random_token
     }
 
-    it 'assigns an "id"' do
+    it 'assigns an "id" (Game Id)' do
       subject.start!
       expect(subject.id).to eq random_token
     end
