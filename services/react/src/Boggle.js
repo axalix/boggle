@@ -42,6 +42,30 @@ export default class Boggle extends Component {
     return result;
   }
 
+  componentDidMount() {
+    const game_id = localStorage.getItem('game_id');
+    if (game_id) {
+      axios.get('http://localhost:3000/game', {headers: {'Game-Token': game_id}})
+        .then(res => {
+          this.setState({
+            status: 'running',
+            game_token: res.data.id,
+            table: this.string_to_board(res.data.board.dice_string, res.data.board.size),
+            list: res.data.words,
+            results: {
+              total_score: 0,
+              words_with_scores: []
+            },
+            game_length_secs: res.data.seconds_left,
+            message: {
+              type: 'Notification',
+              text: ''
+            }
+          })
+        })
+    }
+  }
+
   addWordCallback = (word) => {
     this.setState({message: {type: '', text: ''}});
     axios.post('http://localhost:3000/game/word', {word: word}, {headers: {'Game-Token': this.state.game_token}})
@@ -56,6 +80,7 @@ export default class Boggle extends Component {
 
   stop = () => {
     // this.setState({message: {type: '', text: ''}});
+    localStorage.clear();
     axios.get('http://localhost:3000/game/results', {headers: {'Game-Token': this.state.game_token}})
       .then(res => {
         this.setState({
@@ -71,11 +96,12 @@ export default class Boggle extends Component {
     this.setState({message: {type: '', text: ''}});
     axios.post('http://localhost:3000/game', {})
       .then(res => {
+        localStorage.setItem('game_id', res.data.id);
         this.setState({
           status: 'running',
           game_token: res.data.id,
           table: this.string_to_board(res.data.board.dice_string, res.data.board.size),
-          list: [],
+          list: res.data.words,
           results: {
             total_score: 0,
             words_with_scores: []
