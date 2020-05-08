@@ -15,14 +15,12 @@ services:
       - api_redis
       - dictionary_redis
 
-
   api_redis:
     image: redis
     volumes:
       - 'redis:/data'
     expose:
       - 6379
-
 
   dictionary_redis:
     build: ./services/dictionary
