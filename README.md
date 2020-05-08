@@ -82,7 +82,7 @@ Approximately 100 tests cover the backend logic.
 ### "api_redis"
 
 "api" service doesn't use ActiveRecord and any relational DB, however it relies on Redis.
-"api" service connected to "api_redis" to store games tokens and found words for a certain period of time. This allows to refresh and continue the game from where it was stopped. Also it is possible to previous games within 24 hours.
+"api" service connected to "api_redis" to store games tokens and found words for a certain period of time. This allows to refresh and continue the game from where it was stopped. Also it is possible to see previous games created in last 24 hours.
 
 ### "react" service
 
