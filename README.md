@@ -72,8 +72,8 @@ Simple Redis service, populated with `"SADD", "dict", <word>` command. See `serv
 
 ### "api" service
 
-It is a backend service, built with as [API-only Rails app](https://guides.rubyonrails.org/api_app.html)
-With this command `rails new boggle --api -O --skip-test --skip-action-mailer --skip-active-record` 
+It is a backend service, built as [API-only Rails app](https://guides.rubyonrails.org/api_app.html)
+with this command `rails new boggle --api -O --skip-test --skip-action-mailer --skip-active-record` 
 
 Testing tool `Rspec` was installed separately.
 
