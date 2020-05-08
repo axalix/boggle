@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const CancelButtonStyle = {
   boxShadow: 'inset 0px 1px 0px 0px #f7c5c0',
@@ -7,7 +8,7 @@ const CancelButtonStyle = {
 };
 
 
-const AddWord = ({ add_wrod }) => {
+const AddWord = ({ onAddWord }) => {
   const [word, setWord] = useState('');
 
   const notiftyGame = (e, word) => {
@@ -23,7 +24,7 @@ const AddWord = ({ add_wrod }) => {
       return;
     }
 
-    add_wrod(word);
+    onAddWord(word);
     setWord('')
   };
 
@@ -43,6 +44,10 @@ const AddWord = ({ add_wrod }) => {
       </button>
     </form>
   );
+};
+
+AddWord.propTypes = {
+  onAddWord: PropTypes.func.isRequired
 };
 
 export default AddWord;

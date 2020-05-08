@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 const WorkflowButtonStyle = {
   boxShadow: 'inset 0px 1px 0px 0px #a4e271',
@@ -12,11 +13,16 @@ const WorkflowButtonStyle = {
 const WorkflowButton = props => {
   return (
     <form>
-      <button type="button" style={WorkflowButtonStyle} onClick={props.trigger_status()}>
+      <button type="button" style={WorkflowButtonStyle} onClick={props.onStatusTrigger()}>
         {props.status === 'running' ? 'Stop' : 'Start'}
       </button>
     </form>
   );
+};
+
+WorkflowButton.propTypes = {
+  status: PropTypes.string.isRequired,
+  onStatusTrigger: PropTypes.func.isRequired
 };
 
 export default WorkflowButton;

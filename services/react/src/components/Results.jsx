@@ -1,8 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const HeaderStyle = {
   color: 'GoldenRod',
-  padding: '10px'
+  marginBottom: '15px',
+  display: 'block'
 };
 
 const TableStyle = {
@@ -32,6 +34,10 @@ const Results = props => {
       </table>
     </React.Fragment>
   );
+};
+
+Results.propTypes = {
+  results: PropTypes.object.isRequired
 };
 
 export default Results;

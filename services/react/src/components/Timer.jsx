@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types';
 
 const DivStyle = {
   margin: '10px 0 10px'
@@ -19,7 +20,7 @@ export default class Timer extends Component {
         return
       }
 
-      this.props.trigger_stop();
+      this.props.onTriggerStop();
       clearInterval(this.myInterval);
     }, 1000)
   }
@@ -42,3 +43,8 @@ export default class Timer extends Component {
     )
   }
 }
+
+Timer.propTypes = {
+  game_length_secs: PropTypes.number.isRequired,
+  onTriggerStop:    PropTypes.func.isRequired
+};

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const TableStyle = {
   borderCollapse: 'collapse',
@@ -27,6 +28,10 @@ const Board = props => {
       </tbody>
     </table>
   );
+};
+
+Board.propTypes = {
+  table: PropTypes.array.isRequired
 };
 
 export default Board;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const TableStyle = {
   borderCollapse: 'collapse',
@@ -23,6 +24,10 @@ const FoundWordsList = props => {
       </tbody>
     </table>
   );
+};
+
+FoundWordsList.propTypes = {
+  list: PropTypes.array.isRequired
 };
 
 export default FoundWordsList;

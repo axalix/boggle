@@ -9,7 +9,7 @@ import AddWord from "./components/AddWord";
 import WorkflowButton from "./components/WorkflowButton";
 import MessageBlock from "./components/MessageBlock";
 import Results from "./components/Results";
-
+import Rules from "./components/Rules";
 
 export default class Boggle extends Component {
   constructor(props) {
@@ -30,9 +30,15 @@ export default class Boggle extends Component {
         text: ''
       }
     };
+
+    this.axios = axios.create({
+      baseURL: 'http://localhost:3000/',
+      timeout: 1000
+    });
+
   }
 
-  string_to_board(str, size) {
+  string_to_board = (str, size) => {
     str = str.split('');
     const result = [];
     while (str.length) {
@@ -40,14 +46,12 @@ export default class Boggle extends Component {
     }
 
     return result;
-  }
+  };
 
-  // Next 4 methods could be done with a help of Redux.
-  // I didn't do that to save some time for a better backend.
   componentDidMount() {
     const game_id = localStorage.getItem('game_id');
     if (game_id) {
-      axios.get('http://localhost:3000/game', {headers: {'Game-Token': game_id}})
+      this.axios.get('game', {headers: {'Game-Token': game_id}})
         .then(res => {
           this.setState({
             status: 'running',
@@ -68,10 +72,10 @@ export default class Boggle extends Component {
     }
   }
 
-  addWordCallback = (word) => {
+  addWord = (word) => {
     this.setState({message: {type: '', text: ''}});
-    axios.post('http://localhost:3000/game/word', {word: word}, {headers: {'Game-Token': this.state.game_token}})
-      .then(res => {
+    this.axios.post('game/word', {word: word}, {headers: {'Game-Token': this.state.game_token}})
+      .then(() => {
         this.setState(prevState => ({
           list: [word, ...prevState.list]
         }))
@@ -83,7 +87,7 @@ export default class Boggle extends Component {
   stop = () => {
     // this.setState({message: {type: '', text: ''}});
     localStorage.clear();
-    axios.get('http://localhost:3000/game/results', {headers: {'Game-Token': this.state.game_token}})
+    this.axios.get('game/results', {headers: {'Game-Token': this.state.game_token}})
       .then(res => {
         this.setState({
           status: 'ended',
@@ -96,7 +100,7 @@ export default class Boggle extends Component {
 
   start = () => {
     this.setState({message: {type: '', text: ''}});
-    axios.post('http://localhost:3000/game', {})
+    this.axios.post('game', {})
       .then(res => {
         localStorage.setItem('game_id', res.data.id);
         this.setState({
@@ -132,7 +136,7 @@ export default class Boggle extends Component {
           BOGGLE
 
           {this.state.status === 'running' &&
-          <Timer trigger_stop={() => this.stop()} game_length_secs={this.state.game_length_secs}/>}
+          <Timer onTriggerStop={() => this.stop()} game_length_secs={this.state.game_length_secs}/>}
 
           <MessageBlock message={this.state.message}/>
 
@@ -140,34 +144,26 @@ export default class Boggle extends Component {
 
             <div className="left_column">
               <Board table={this.state.table}/>
-              <WorkflowButton status={this.state.status} trigger_status={() => this.triggerStatus}/>
+              <WorkflowButton status={this.state.status} onStatusTrigger={() => this.triggerStatus}/>
             </div>
 
             <div className="right_column">
 
               {this.state.status === 'running' &&
               <React.Fragment>
-                <AddWord add_wrod={(word) => this.addWordCallback(word)}/>
+                <AddWord onAddWord={(word) => this.addWord(word)}/>
                 <FoundWordsList list={this.state.list}/>
               </React.Fragment>}
 
 
               {this.state.status === 'ended' &&
-              <Results results={this.state.results} />
+              <Results results={this.state.results}/>
               }
 
 
               {this.state.status === 'welcome' &&
-              <React.Fragment>
-                <span>How to Play</span>
-                <div className="Boggle-rules">
-                  <ul>
-                  <li>The letters must be adjoining in a 'chain'. (Letter cubes in the chain may be adjacent horizontally, vertically, or diagonally.)</li>
-                  <li>Words must contain at least three letters.</li>
-                  <li>No letter cube may be used more than once within a single word.</li>
-                  </ul>
-                </div>
-              </React.Fragment>}
+              <Rules/>
+              }
             </div>
 
           </div>
