@@ -4,7 +4,7 @@
 
 Boggle - a word game invented by Allan Turoff.        
 
-![Image description](https://raw.githubusercontent.com/axalix/boggle/master/boggle.png)
+![Boggle UI](https://c2n.me/47pGybk.png)
       
 ## How to install TODO      
 1. docker-compose build  
