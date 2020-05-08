@@ -6,10 +6,11 @@ Boggle - a word game invented by Allan Turoff.
 
 ![Boggle UI](https://c2n.me/47pGybk.png)
       
-## How to install TODO      
-1. docker-compose build  
-2. docker-compose up -d  
-3. the game should be available in a browser here: http://localhost:3001/  
+## How to install TODO
+1. be sure ports `3000` and `3001` are not used
+2. docker-compose build  
+3. docker-compose up -d  
+4. the game should be available in a browser here: http://localhost:3001/  
        
 ## Game rules and assumptions    
  One cube is printed with "Qu". This is because "q" is nearly always followed by "u" in English words.    
