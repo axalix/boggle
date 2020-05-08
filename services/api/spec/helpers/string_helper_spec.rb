@@ -12,6 +12,7 @@ RSpec.describe StringHelper do
     expect(StringHelper.word_boggle_score('a')).to eq 0
     expect(StringHelper.word_boggle_score('bb')).to eq 0
     expect(StringHelper.word_boggle_score('ccc')).to eq 1
+    expect(StringHelper.word_boggle_score('dddd')).to eq 1
     expect(StringHelper.word_boggle_score('eeeee')).to eq 2
     expect(StringHelper.word_boggle_score('ffffff')).to eq 3
     expect(StringHelper.word_boggle_score('ggggggg')).to eq 5
