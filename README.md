@@ -93,12 +93,12 @@ It is a frontend to run the game. Please note, that 80% of time and main focus w
 Postman file with API is available under
 `services/api/Boggle.postman_collection.json`
 
-| Description |Method| Path  | Header | 
-|--|--|--|--|
-| Create a new game |POST|/game|-|
-| Show Game |GET|/game|Game-Token|
-| Add a word to a list|POST| /game/word |Game-Token|
-| Get game results |GET| /game/results |Game-Token|
+| Description |Method| Path  | Header | Params |
+|--|--|--|--|--|
+| Create a new game |POST|/game|-|{dice_type: 'classic_16'}|
+| Show Game |GET|/game|Game-Token|-|
+| Add a word to a list|POST| /game/word |Game-Token|{word: 'apple'}
+| Get game results |GET| /game/results |Game-Token|-|
 
 ### Examples
 
@@ -110,10 +110,7 @@ Postman file with API is available under
           "size":4,
           "dice_string":"onhiliutauiuiqhp"
        },
-       "dice":{
-          "dice_chars":"aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw",
-          "dice_count":16
-       },
+       "dice_type":"classic_16",
        "seconds_left":173,
        "words":["apple"]
     }
@@ -126,10 +123,7 @@ Postman file with API is available under
           "size":4,
           "dice_string":"onhiliutauiuiqhp"
        },
-       "dice":{
-          "dice_chars":"aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw",
-          "dice_count":16
-       },
+       "dice_type":"classic_16",
        "seconds_left":0,
        "results":{
           "total_score":2,
@@ -141,16 +135,22 @@ Postman file with API is available under
     }
     
 
-## Tests and Code quality  
+## Tests and code quality  
   
 - "api" service is covered by Rspec tests which are available in `services/api/spec`    
 - "api" code quality is monitored and covered by Rubocop with standard Rails rules, enforced with a help of`rubocop-rails_config` gem.    
     
     
       
-## Some useful commands  
+## Some useful commands
+
  - `docker exec -it boggle_api bundle exec rubocop` - to be sure the code follows the styling.         
    (RuboCop configuration which has the same code style checking as official Ruby on Rails.        
    see *rubocop-rails_config*)        
 
  - `docker exec -it boggle_api bundle exec rspec -fd` - to run tests
+ 
+## Dev notes
+
+ - as per requirements, the main focus was given to backend
+ - ability to change dice type and refresh / continue a game after a fail over are optional

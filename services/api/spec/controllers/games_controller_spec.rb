@@ -17,7 +17,7 @@ RSpec.describe GamesController, type: :controller do
   let(:expected_game_data) {
     {
         'board' => { 'size' => 4, 'dice_string' => a_kind_of(String) },
-        'dice' => { 'dice_chars' => 'aaciotabiltyabjmoqacdempacelrsadenvzahmorsbiforxdenoswdknotueefhiyegkluyegintvehinpselpstugilruw', 'dice_count' => 16 },
+        'dice_type' => 'classic_16',
         'seconds_left' => a_kind_of(Numeric),
         'words' => []
     }
@@ -33,12 +33,12 @@ RSpec.describe GamesController, type: :controller do
   describe 'game token is not sent' do
     context '#create' do
       it 'returns status 200' do
-        post :create
+        post :create, params: { dice_type: :classic_16 }
         expect_good_response response
       end
 
       it 'returns data in a correct format' do
-        get :create
+        post :create, params: { dice_type: :classic_16 }
         game_data = JSON.parse(response.body)
         expect(game_data['id']).to be_a_kind_of(String)
         expect(game_data).to include expected_game_data

@@ -38,7 +38,7 @@ button:active {
   top:1px;
 }
 
-input {
+input, select {
   border: 1px solid #231407;
   font-size:15px;
   padding: 6px;

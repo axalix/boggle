@@ -8,7 +8,7 @@ const DivStyle = {
 export default class Timer extends Component {
   constructor(props) {
     super(props);
-    this.state = {seconds: props.game_length_secs};
+    this.state = {seconds: props.gameLengthSecs};
   }
 
   componentDidMount() {
@@ -45,6 +45,6 @@ export default class Timer extends Component {
 }
 
 Timer.propTypes = {
-  game_length_secs: PropTypes.number.isRequired,
+  gameLengthSecs: PropTypes.number.isRequired,
   onTriggerStop:    PropTypes.func.isRequired
 };

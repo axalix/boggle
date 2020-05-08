@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const NotificationStyle = {
   backgroundColor: '#5b8009',
@@ -18,6 +19,10 @@ const MessageBlock = props => {
       </div>
     </div>
   );
+};
+
+MessageBlock.propTypes = {
+  message: PropTypes.object.isRequired
 };
 
 export default MessageBlock;

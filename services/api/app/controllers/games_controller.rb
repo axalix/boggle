@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class GamesController < ApplicationController
+  DEFAULT_GAME_LENGTH = 180
+
   before_action :set_game_token
+  before_action :create_game, only: :create
   before_action :set_game, except: :create
 
   attr_reader :game, :game_token
@@ -11,15 +14,11 @@ class GamesController < ApplicationController
   end
 
   def create
-    # TODO: parameters shouldn't be "magic numbers". Builders or factory calls are welcome here.
-    # I left it "as is" to save some time for frontend
-    @game = Boggle::Game.new(dice_type: :classic_16, board_size: 4, game_length_secs: 180)
     game.start!
     render json: game_data
   end
 
   def add_word
-    # TODO: word - "empty string" validation
     word = StringHelper.sanitize_and_lowercase(params.require(:word))
     game.add_word!(word)
     render :nothing
@@ -36,7 +35,7 @@ class GamesController < ApplicationController
     {
       id:           game.id,
       board:        { size: game.board.size, dice_string: game.board.dice_string },
-      dice:         Boggle::Dice::TYPES[game.dice_type],
+      dice_type:    game.dice_type,
       seconds_left: game.timer.seconds_left,
       words:        game.found_words_list.get_all
     }
@@ -53,6 +52,17 @@ class GamesController < ApplicationController
   private def set_game
     raise Boggle::Errors::MissingToken unless game_token
     @game = Boggle::Game.restore(game_token)
+  end
+
+  private def create_game
+    dice_type = params.require(:dice_type).to_sym
+    board_size = dice_type == :fancy_25 ? 5 : 4
+
+    @game = Boggle::Game.new(
+      dice_type: Boggle::Dice::TYPES.key?(dice_type) ? dice_type : :classic_16,
+      board_size: board_size,
+      game_length_secs: DEFAULT_GAME_LENGTH
+    )
   end
 
   private def set_game_token

@@ -10,6 +10,7 @@ import WorkflowButton from "./components/WorkflowButton";
 import MessageBlock from "./components/MessageBlock";
 import Results from "./components/Results";
 import Rules from "./components/Rules";
+import DiceType from "./components/DiceType";
 
 export default class Boggle extends Component {
   constructor(props) {
@@ -17,6 +18,7 @@ export default class Boggle extends Component {
 
     this.state = {
       game_token: null,
+      dice_type: 'classic_16',
       status: 'welcome',
       table: this.string_to_board('****************', 4),
       list: [],
@@ -56,6 +58,7 @@ export default class Boggle extends Component {
           this.setState({
             status: 'running',
             game_token: res.data.id,
+            dice_type: res.data.dice_type,
             table: this.string_to_board(res.data.board.dice_string, res.data.board.size),
             list: res.data.words,
             results: {
@@ -100,12 +103,13 @@ export default class Boggle extends Component {
 
   start = () => {
     this.setState({message: {type: '', text: ''}});
-    this.axios.post('game', {})
+    this.axios.post('game', {dice_type: this.state.dice_type})
       .then(res => {
         localStorage.setItem('game_id', res.data.id);
         this.setState({
           status: 'running',
           game_token: res.data.id,
+          dice_type: res.data.dice_type,
           table: this.string_to_board(res.data.board.dice_string, res.data.board.size),
           list: res.data.words,
           results: {
@@ -121,7 +125,7 @@ export default class Boggle extends Component {
       })
   };
 
-  triggerStatus = () => {
+  handleTriggerStatus = () => {
     if (this.state.status === 'running') {
       this.stop()
     } else {
@@ -129,14 +133,18 @@ export default class Boggle extends Component {
     }
   };
 
+  handleDiceTypeChange = (dice_type) => {
+    this.setState({dice_type: dice_type});
+  };
+
   render() {
     return (
       <div className="Boggle">
         <header className="Boggle-header">
           BOGGLE
-
+          <DiceType diceType={this.state.dice_type} onDiceTypeChange={(dice_type) => this.handleDiceTypeChange(dice_type)} disabled={this.state.status === 'running'} />
           {this.state.status === 'running' &&
-          <Timer onTriggerStop={() => this.stop()} game_length_secs={this.state.game_length_secs}/>}
+          <Timer onTriggerStop={() => this.stop()} gameLengthSecs={this.state.game_length_secs}/>}
 
           <MessageBlock message={this.state.message}/>
 
@@ -144,7 +152,7 @@ export default class Boggle extends Component {
 
             <div className="left_column">
               <Board table={this.state.table}/>
-              <WorkflowButton status={this.state.status} onStatusTrigger={() => this.triggerStatus}/>
+              <WorkflowButton status={this.state.status} onStatusTrigger={() => this.handleTriggerStatus}/>
             </div>
 
             <div className="right_column">
