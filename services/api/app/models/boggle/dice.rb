@@ -26,7 +26,7 @@ module Boggle
 
     validates :type, inclusion: { in: TYPES.keys }, presence: true
 
-    # This class method returns a "dice_string": selected (shuffled) chars on all the dice
+    # This method returns a "dice_string": selected (shuffled) chars on all the dice + shuffle the dice as well
     def roll_all
       result = []
       0.upto(TYPES[type][:dice_count] - 1) { |dice_number| result << self.roll(dice_number) }
