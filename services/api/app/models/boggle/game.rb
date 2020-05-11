@@ -46,6 +46,14 @@ module Boggle
       save!
     end
 
+    def results
+      Boggle::GetGameResults.call(words_with_scores: found_words_list.get_all(with_scores: true))
+    end
+
+    def found_words
+      found_words_list.get_all
+    end
+
     def add_word!(word)
       game_over_check!
 

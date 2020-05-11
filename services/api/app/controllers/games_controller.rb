@@ -10,43 +10,36 @@ class GamesController < ApplicationController
   attr_reader :game, :game_token
 
   def show
-    render json: game_data
+    render json: game_attributes
   end
 
   def create
     game.start!
-    render json: game_data
+    render json: game_attributes
   end
 
   def add_word
     word = StringHelper.sanitize_and_lowercase(params.require(:word))
     game.add_word!(word)
-    render :nothing
+    head :no_content
   end
 
   def get_results
     game.stop!
-    render json: game_results_data
+    render json: game_attributes(with_results: true)
   end
 
   #-------------------
 
-  private def game_data
-    {
+  private def game_attributes(with_results: false)
+    data = {
       id:           game.id,
       board:        { size: game.board.size, dice_string: game.board.dice_string },
       dice_type:    game.dice_type,
       seconds_left: game.timer.seconds_left,
-      words:        game.found_words_list.get_all
     }
-  end
 
-  private def game_results_data
-    # results could be cached / persisted too, so we won't recalculate them every time,
-    # but I didn't do to save some time for the frontend part
-    game_data
-      .without(:words)
-      .merge(results: Boggle::GetGameResults.call(words_with_scores: game.found_words_list.get_all(with_scores: true)))
+    data.merge(with_results ? { results: game.results } : { words: game.found_words })
   end
 
   private def set_game

@@ -85,8 +85,7 @@ RSpec.describe GamesController, type: :controller do
     context '#add_word' do
       it 'returns status 200' do
         post :add_word, params: { word: 'apple' }
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq 'text/plain; charset=utf-8'
+        expect(response).to have_http_status(:no_content)
       end
 
       it 'returns status 422 and an error about an empty word' do

@@ -192,4 +192,21 @@ RSpec.describe Boggle::Game, type: :model do
       expect(subject.over?).to eq true
     end
   end
+
+  describe '#found_words' do
+    it 'returns found words' do
+      allow(subject.found_words_list).to receive(:get_all).and_return ['apple', 'pear']
+      expect(subject.found_words).to eq %w[apple pear]
+    end
+  end
+
+  describe '#results' do
+    it 'returns found words with scores' do
+      allow(subject.found_words_list).to receive(:get_all).and_return [['apple', 1.0], ['pear', 1.0]]
+      expect(subject.results).to eq(
+        total_score: 2,
+        words_with_scores: [['apple', 1], ['pear', 1]]
+      )
+    end
+  end
 end
