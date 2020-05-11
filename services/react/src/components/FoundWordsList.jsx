@@ -16,7 +16,7 @@ const FoundWordsList = props => {
   return (
     <table style={TableStyle}>
       <tbody>
-      {props.list.map((row, index) =>
+      {props.words.map((row, index) =>
         <tr key={index}>
             <td key={index} style={TdStyle}>{row}</td>
         </tr>
@@ -27,7 +27,7 @@ const FoundWordsList = props => {
 };
 
 FoundWordsList.propTypes = {
-  list: PropTypes.array.isRequired
+  words: PropTypes.array.isRequired
 };
 
 export default FoundWordsList;

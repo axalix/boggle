@@ -21,7 +21,7 @@ export default class Boggle extends Component {
       dice_type: 'classic_16',
       status: 'welcome',
       table: this.string_to_board('****************', 4),
-      list: [],
+      words: [],
       results: {
         total_score: 0,
         words_with_scores: []
@@ -60,7 +60,7 @@ export default class Boggle extends Component {
             game_token: res.data.id,
             dice_type: res.data.dice_type,
             table: this.string_to_board(res.data.board.dice_string, res.data.board.size),
-            list: res.data.words,
+            words: res.data.words,
             results: {
               total_score: 0,
               words_with_scores: []
@@ -80,7 +80,7 @@ export default class Boggle extends Component {
     this.axios.post('game/word', {word: word}, {headers: {'Game-Token': this.state.game_token}})
       .then(() => {
         this.setState(prevState => ({
-          list: [word, ...prevState.list]
+          words: [word, ...prevState.words]
         }))
       }).catch((error) => {
       this.setState({message: {type: 'Error', text: error.response.data.message}});
@@ -111,7 +111,7 @@ export default class Boggle extends Component {
           game_token: res.data.id,
           dice_type: res.data.dice_type,
           table: this.string_to_board(res.data.board.dice_string, res.data.board.size),
-          list: res.data.words,
+          words: res.data.words,
           results: {
             total_score: 0,
             words_with_scores: []
@@ -160,7 +160,7 @@ export default class Boggle extends Component {
               {this.state.status === 'running' &&
               <React.Fragment>
                 <AddWord onAddWord={(word) => this.addWord(word)}/>
-                <FoundWordsList list={this.state.list}/>
+                <FoundWordsList words={this.state.words}/>
               </React.Fragment>}
 
 
