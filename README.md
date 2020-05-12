@@ -6,7 +6,7 @@ Boggle - a word game invented by Allan Turoff.
 
 ![Boggle UI](https://c2n.me/47pGybk.png)
       
-## How to install TODO
+## How to install
 1. be sure ports `3000` and `3001` are not used
 2. docker-compose build  
 3. docker-compose up -d  
@@ -149,9 +149,7 @@ Postman file with API is available under
       
 ## Some useful commands
 
- - `docker exec -it boggle_api bundle exec rubocop` - to be sure the code follows the styling.         
-   (RuboCop configuration which has the same code style checking as official Ruby on Rails.        
-   see *rubocop-rails_config*)        
+ - `docker exec -it boggle_api bundle exec rubocop` - to be sure the code follows the styling (by RuboCop).
 
  - `docker exec -it boggle_api bundle exec rspec -fd` - to run tests
  
